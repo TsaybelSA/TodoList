@@ -86,8 +86,8 @@
 		17419DDE2873065E0089DAFD /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				17419DC928728AD50089DAFD /* RootViewController.swift */,
 				17419DDF2873D6940089DAFD /* EditCellViewController.swift */,
+				17419DC928728AD50089DAFD /* RootViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

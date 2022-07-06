@@ -10,4 +10,5 @@ import Foundation
 struct TodoItem: Codable {
 	var text: String
 	var id = UUID()
+	var isDone = false
 }

@@ -9,15 +9,21 @@ import UIKit
 
 class TableViewCell: UITableViewCell {
 	
-	var todoItem: TodoItem!
+	var todoItem = TodoItem(text: "")
+	
 	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
-
+		
+		contentView.addSubview(selectionImage)
 		contentView.addSubview(infoButton)
 		contentView.addSubview(label)
 		NSLayoutConstraint.activate([
-			label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+			selectionImage.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+			selectionImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+			selectionImage.widthAnchor.constraint(equalToConstant: 30),
+			selectionImage.heightAnchor.constraint(equalToConstant: 30),
+			label.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 20),
 			label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 			infoButton.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 10),
 			infoButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -29,19 +35,40 @@ class TableViewCell: UITableViewCell {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	var editHandler: (TableViewCell, IndexPath) -> Void = { _, _ in}
+	var editHandler: (TableViewCell) -> Void = { _ in}
 	
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
+	override func setEditing(_ editing: Bool, animated: Bool) {
 		self.selectionStyle = .none
-    }
+		
+//		if editing == true {
+//			UIImageView.animate(withDuration: 0.2) {
+//				self.selectionImage.transform = CGAffineTransform(translationX: 0, y: 0)
+//				self.label.transform = CGAffineTransform(translationX: 0, y: 0)
+//				self.infoButton.isHidden = true
+//			}
+//		} else {
+//			UIImageView.animate(withDuration: 0.2) {
+//				self.selectionImage.transform = CGAffineTransform(translationX: -100, y: 0)
+//				self.label.transform = CGAffineTransform(translationX: -50, y: 0)
+//				self.infoButton.isHidden = false
+//			}
+//		}
+	}
 	
-	func setupCell(with item: TodoItem, editHandler: @escaping (TableViewCell, IndexPath) -> Void) {
+	func setupCell(with item: TodoItem, editHandler: @escaping (TableViewCell) -> Void) {
 		self.todoItem = item
 		self.label.text = item.text
+		self.label.textColor = todoItem.isDone ? .gray : .black
+		self.selectionImage.image = UIImage(systemName: todoItem.isDone ? "circle.fill" : "circle.dashed")
 		self.editHandler = editHandler
 	}
+	
+	lazy private var selectionImage: UIImageView = {
+		let image = UIImage()
+		let imageView = UIImageView(image: image)
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		return imageView
+	}()
 	
 	lazy private var label: UILabel = {
 		let label = UILabel(frame: .zero)
@@ -59,7 +86,6 @@ class TableViewCell: UITableViewCell {
 	}()
 //
 	@objc private func infoButtonPressed() {
-//		guard let self = self else { return }
-		editHandler(self, IndexPath())
+		editHandler(self)
 	}
 }
