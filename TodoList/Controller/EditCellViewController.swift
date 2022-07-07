@@ -9,9 +9,9 @@ import UIKit
 
 class EditCellViewController: UIViewController {
 	
-	var todoItem: TodoItem!
+	var item: Item!
 	
-	var complition: (TodoItem) -> Void = { _ in}
+	var complition: (Item) -> Void = { _ in}
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +20,7 @@ class EditCellViewController: UIViewController {
 		setupToHideKeyboardOnTapOnView()
 		
 		let textField = UITextField()
-		textField.text = todoItem.text
+		textField.text = item.title
 		textField.backgroundColor = .lightGray
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
@@ -39,8 +39,8 @@ class EditCellViewController: UIViewController {
 extension EditCellViewController: UITextFieldDelegate {
 	func textFieldDidEndEditing(_ textField: UITextField) {
 		guard let text = textField.text else { return }
-		todoItem.text = text
-		complition(todoItem)
+		item.title = text
+		complition(item)
 		print("End edit")
 	}
 }

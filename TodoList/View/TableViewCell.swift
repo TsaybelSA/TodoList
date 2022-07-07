@@ -9,7 +9,7 @@ import UIKit
 
 class TableViewCell: UITableViewCell {
 	
-	var todoItem = TodoItem(text: "")
+	var item = Item()
 	
 	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -55,17 +55,16 @@ class TableViewCell: UITableViewCell {
 //		}
 	}
 	
-	func setupCell(with item: TodoItem, editHandler: @escaping (TableViewCell) -> Void) {
-		self.todoItem = item
-		self.label.text = item.text
-		self.label.textColor = todoItem.isDone ? .gray : .black
-		self.selectionImage.image = UIImage(systemName: todoItem.isDone ? "circle.fill" : "circle.dashed")
+	func setupCell(with item: Item, editHandler: @escaping (TableViewCell) -> Void) {
+		self.item = item
+		self.label.text = item.title
+		self.label.textColor = item.isDone ? .gray : .black
+		self.selectionImage.image = UIImage(systemName: item.isDone ? "circle.fill" : "circle.dashed")
 		self.editHandler = editHandler
 	}
 	
 	lazy private var selectionImage: UIImageView = {
-		let image = UIImage()
-		let imageView = UIImageView(image: image)
+		let imageView = UIImageView()
 		imageView.translatesAutoresizingMaskIntoConstraints = false
 		return imageView
 	}()

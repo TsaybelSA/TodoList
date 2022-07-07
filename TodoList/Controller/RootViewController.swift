@@ -6,12 +6,23 @@
 //
 
 import SwiftUI
+import CoreData
 
 class RootViewController: UIViewController {
 	
-	let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("todoItems")
+	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
-	var items = [TodoItem(text: "First but not least"), TodoItem(text: "one more"), TodoItem(text: "just do it"), TodoItem(text: "good job!")]
+	var items = [Item]()
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		view.backgroundColor = .white
+		title = "Todo List"
+		navigationController?.navigationBar.prefersLargeTitles = true
+				
+		setupView()
+		loadItems()
+	}
 	
 	private let tableView: UITableView = {
 		let tableView = UITableView()
@@ -19,15 +30,11 @@ class RootViewController: UIViewController {
 		return tableView
 	}()
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		view.backgroundColor = .white
-		title = "Todo List"
-		navigationController?.navigationBar.prefersLargeTitles = true
-		
-		setupView()
-		loadItems()
-	}
+	private let searchBar: UISearchBar = {
+		let searchBar = UISearchBar()
+		searchBar.translatesAutoresizingMaskIntoConstraints = false
+		return searchBar
+	}()
 	
 	//MARK: - Setup view appearance
 	
@@ -35,16 +42,21 @@ class RootViewController: UIViewController {
 		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
 		
+		searchBar.delegate = self
 		tableView.delegate = self
 		tableView.dataSource = self
 		tableView.register(TableViewCell.self, forCellReuseIdentifier: "reusableCell")
 		tableView.rowHeight = 50
 		tableView.allowsSelectionDuringEditing = true
 		
-		
+		setupToHideKeyboardOnTapOnView()
+		view.addSubview(searchBar)
 		view.addSubview(tableView)
 		NSLayoutConstraint.activate([
-			tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
 			tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 			tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -52,6 +64,7 @@ class RootViewController: UIViewController {
 	}
 	
 	//MARK: - Creating New Todo Item
+	
 	@objc private func addButtonPressed() {
 		let ac = UIAlertController(title: "Add New Task", message: "", preferredStyle: .alert)
 		ac.addTextField { textField in
@@ -59,10 +72,12 @@ class RootViewController: UIViewController {
 		}
 		let confirmAction = UIAlertAction(title: "Add Item", style: .default) { _ in
 			guard let text = ac.textFields!.first?.text else { return }
-			let newItem = TodoItem(text: text)
-			guard newItem.text != "" else { return }
+			guard text != " " && text != "" else { return }
+			let newItem = Item(context: self.context)
+			newItem.title = text
+			newItem.isDone = false
+			newItem.id = UUID()
 			self.items.append(newItem)
-			self.tableView.reloadData()
 			self.saveItems()
 		}
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
@@ -71,61 +86,47 @@ class RootViewController: UIViewController {
 		present(ac, animated: true)
 	}
 	
+	//MARK: - Model Manipulation Methods
+	
 	private func saveItems() {
 		do {
-			let encoded = try JSONEncoder().encode(items)
-			try encoded.write(to: filePath!)
+			try context.save()
 			print("Saved")
-
 		} catch {
-			print(error)
+			print("Failed to save context: \(error)")
 		}
+		tableView.reloadData()
 	}
 	
-	private func loadItems() {
+	private func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
 		do {
-			guard let data = try? Data(contentsOf: filePath!) else { return }
-			let decodedData = try JSONDecoder().decode([TodoItem].self, from: data)
-			DispatchQueue.main.async {
-				self.items = decodedData
-				self.tableView.reloadData()
-				print("Loaded")
-			}
+			items = try context.fetch(request)
 		} catch {
-			print(error)
+			print("Failed to fetch data from context! \(error)")
 		}
+		tableView.reloadData()
 	}
 }
 
-//MARK: - UITableViewDelegate
+//MARK: - Table View Methods
 
 extension RootViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
-		if items[indexPath.row].isDone {
-			items[indexPath.row].isDone = false
-		} else {
-			items[indexPath.row].isDone = true
-		}
+		items[indexPath.row].isDone.toggle()
 		saveItems()
-		tableView.reloadData()
 	}
 
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
-		
 		tableView.setEditing(editing, animated: true)
 	}
-	
-	//MARK: - Edit Cell
 
 	private func editCell(_ cell: TableViewCell) -> Void {
 		let vc = EditCellViewController()
-		vc.todoItem = cell.todoItem
+		vc.item = cell.item
 		vc.complition = { [weak self] todoItem in
 			if let itemIndex = self?.items.firstIndex(where: { $0.id == todoItem.id }) {
-				self?.items[itemIndex].text = todoItem.text
-				self?.tableView.reloadData()
+				self?.items[itemIndex].title = todoItem.title
 				self?.saveItems()
 			}
 
@@ -135,11 +136,9 @@ extension RootViewController: UITableViewDelegate {
 	
 	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 		let deleteAction = UIContextualAction(style: .destructive, title: "Delete") {_,_,_ in
-			let cell = tableView.cellForRow(at: indexPath) as! TableViewCell
-			guard let index = self.items.firstIndex(where: { $0.id == cell.todoItem.id }) else { return }
-			self.items.remove(at: index)
+			self.context.delete(self.items[indexPath.row])
+			self.items.remove(at: indexPath.row)
 			self.saveItems()
-			tableView.reloadData()
 		}
 		return UISwipeActionsConfiguration(actions: [deleteAction])
 	}
@@ -158,6 +157,22 @@ extension RootViewController: UITableViewDataSource {
 		let item = items[indexPath.row]
 		cell.setupCell(with: item, editHandler: editCell)
 		return cell
+	}
+}
+
+//MARK: - Search Bar Methods
+
+extension RootViewController: UISearchBarDelegate {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+		guard searchBar.text != "" else { loadItems(); return }
+		let request: NSFetchRequest<Item> = Item.fetchRequest()
+		request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+		request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+		loadItems(with: request)
+	}
+	
+	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+		loadItems()
 	}
 }
 
