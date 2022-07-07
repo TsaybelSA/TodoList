@@ -38,6 +38,7 @@ class TableViewCell: UITableViewCell {
 	var editHandler: (TableViewCell) -> Void = { _ in}
 	
 	override func setEditing(_ editing: Bool, animated: Bool) {
+		super.setEditing(editing, animated: animated)
 		self.selectionStyle = .none
 		
 //		if editing == true {

@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreData
 
-class RootViewController: UIViewController {
+class TodoItemsViewController: UIViewController {
 	
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
@@ -19,7 +19,9 @@ class RootViewController: UIViewController {
 		view.backgroundColor = .white
 		title = "Todo List"
 		navigationController?.navigationBar.prefersLargeTitles = true
-				
+		
+		print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+
 		setupView()
 		loadItems()
 	}
@@ -41,6 +43,7 @@ class RootViewController: UIViewController {
 	private func setupView() {
 		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+		navigationItem.leftBarButtonItem = editButtonItem
 		
 		searchBar.delegate = self
 		tableView.delegate = self
@@ -76,7 +79,8 @@ class RootViewController: UIViewController {
 			let newItem = Item(context: self.context)
 			newItem.title = text
 			newItem.isDone = false
-			newItem.id = UUID()
+			let safeIndex = NSNumber(integerLiteral: min(0, self.items.count))
+			newItem.id = safeIndex
 			self.items.append(newItem)
 			self.saveItems()
 		}
@@ -100,6 +104,7 @@ class RootViewController: UIViewController {
 	
 	private func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
 		do {
+			request.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
 			items = try context.fetch(request)
 		} catch {
 			print("Failed to fetch data from context! \(error)")
@@ -110,7 +115,7 @@ class RootViewController: UIViewController {
 
 //MARK: - Table View Methods
 
-extension RootViewController: UITableViewDelegate {
+extension TodoItemsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		items[indexPath.row].isDone.toggle()
 		saveItems()
@@ -119,6 +124,21 @@ extension RootViewController: UITableViewDelegate {
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
 		tableView.setEditing(editing, animated: true)
+	}
+	
+	//FIX: how to change
+	func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+		return true
+	}
+	
+	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+		let item = items[sourceIndexPath.row]
+		items.remove(at: sourceIndexPath.row)
+		items.insert(item, at: destinationIndexPath.row)
+		for (index, item) in items.enumerated() {
+			item.id = NSNumber(integerLiteral: index)
+		}
+		saveItems()
 	}
 
 	private func editCell(_ cell: TableViewCell) -> Void {
@@ -146,7 +166,7 @@ extension RootViewController: UITableViewDelegate {
 
 //MARK: - UITableViewDataSource
 
-extension RootViewController: UITableViewDataSource {
+extension TodoItemsViewController: UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return items.count
@@ -162,37 +182,20 @@ extension RootViewController: UITableViewDataSource {
 
 //MARK: - Search Bar Methods
 
-extension RootViewController: UISearchBarDelegate {
+extension TodoItemsViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		guard searchBar.text != "" else { loadItems(); return }
 		let request: NSFetchRequest<Item> = Item.fetchRequest()
 		request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-		request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 		loadItems(with: request)
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 		loadItems()
 	}
-}
-
-
-
-struct SwiftUIController: UIViewControllerRepresentable {
-	typealias UIViewControllerType = RootViewController
 	
-	func makeUIViewController(context: Context) -> UIViewControllerType {
-		let vc = UIViewControllerType()
-		return vc
-	}
-	
-	func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-	}
-}
-
-struct SwiftUIController_Previews: PreviewProvider {
-	static var previews: some View {
-		SwiftUIController().edgesIgnoringSafeArea(.all)
+	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+		dismissKeyboard()
 	}
 }
 
