@@ -10,18 +10,26 @@ import CoreData
 
 class TodoItemsViewController: UIViewController {
 	
+	var selectedCategory = Category()
+	
 	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
 	var items = [Item]()
 	
+	convenience init(_ category: Category) {
+		self.init()
+		self.selectedCategory = category
+	}
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .white
-		title = "Todo List"
-		navigationController?.navigationBar.prefersLargeTitles = true
+		title = "\(selectedCategory.name!)"
 		
-		print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-
+		//Long Press gesture to edit
+		let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+		longPressGesture.minimumPressDuration = 1
+		self.tableView.addGestureRecognizer(longPressGesture)
+		
 		setupView()
 		loadItems()
 	}
@@ -38,17 +46,20 @@ class TodoItemsViewController: UIViewController {
 		return searchBar
 	}()
 	
+	@objc func handleLongPress(longPressGesture: UILongPressGestureRecognizer) {
+		isEditing = true
+	}
+	
 	//MARK: - Setup view appearance
 	
 	private func setupView() {
 		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
-		navigationItem.leftBarButtonItem = editButtonItem
 		
 		searchBar.delegate = self
 		tableView.delegate = self
 		tableView.dataSource = self
-		tableView.register(TableViewCell.self, forCellReuseIdentifier: "reusableCell")
+		tableView.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
 		tableView.rowHeight = 50
 		tableView.allowsSelectionDuringEditing = true
 		
@@ -81,6 +92,7 @@ class TodoItemsViewController: UIViewController {
 			newItem.isDone = false
 			let safeIndex = NSNumber(integerLiteral: min(0, self.items.count))
 			newItem.id = safeIndex
+			newItem.parentCategory = self.selectedCategory
 			self.items.append(newItem)
 			self.saveItems()
 		}
@@ -102,9 +114,19 @@ class TodoItemsViewController: UIViewController {
 		tableView.reloadData()
 	}
 	
-	private func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+	private func loadItems(with searchPredicate: NSPredicate? = nil) {
 		do {
+			guard let name = selectedCategory.name else { return }
+			
+			let request: NSFetchRequest<Item> = Item.fetchRequest()
+			let categoryPredicate = NSPredicate(format: "parentCategory.name == %@", name)
+			if let searchPredicate = searchPredicate {
+				request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, searchPredicate])
+			} else {
+				request.predicate = categoryPredicate
+			}
 			request.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+			
 			items = try context.fetch(request)
 		} catch {
 			print("Failed to fetch data from context! \(error)")
@@ -123,14 +145,15 @@ extension TodoItemsViewController: UITableViewDelegate {
 
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
-		tableView.setEditing(editing, animated: true)
+		tableView.setEditing(editing, animated: animated)
+		let addItemButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+		navigationItem.rightBarButtonItem = isEditing == true ? editButtonItem : addItemButton
 	}
 	
-	//FIX: how to change
 	func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
-	
+	//Moving rows
 	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
 		let item = items[sourceIndexPath.row]
 		items.remove(at: sourceIndexPath.row)
@@ -140,8 +163,9 @@ extension TodoItemsViewController: UITableViewDelegate {
 		}
 		saveItems()
 	}
-
-	private func editCell(_ cell: TableViewCell) -> Void {
+	
+	//edit todo item
+	private func editCell(_ cell: TodoTableViewCell) -> Void {
 		let vc = EditCellViewController()
 		vc.item = cell.item
 		vc.complition = { [weak self] todoItem in
@@ -173,7 +197,7 @@ extension TodoItemsViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "reusableCell", for: indexPath) as! TableViewCell
+		let cell = tableView.dequeueReusableCell(withIdentifier: "todoItemCell", for: indexPath) as! TodoTableViewCell
 		let item = items[indexPath.row]
 		cell.setupCell(with: item, editHandler: editCell)
 		return cell
@@ -185,9 +209,8 @@ extension TodoItemsViewController: UITableViewDataSource {
 extension TodoItemsViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		guard searchBar.text != "" else { loadItems(); return }
-		let request: NSFetchRequest<Item> = Item.fetchRequest()
-		request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-		loadItems(with: request)
+		let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+		loadItems(with: predicate)
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

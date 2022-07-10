@@ -1,5 +1,5 @@
 //
-//  TableViewCell.swift
+//  TodoTableViewCell.swift
 //  TodoList
 //
 //  Created by Сергей Цайбель on 04.07.2022.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TableViewCell: UITableViewCell {
+class TodoTableViewCell: UITableViewCell {
 	
 	var item = Item()
 	
@@ -35,7 +35,7 @@ class TableViewCell: UITableViewCell {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	var editHandler: (TableViewCell) -> Void = { _ in}
+	var editHandler: (TodoTableViewCell) -> Void = { _ in}
 	
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
@@ -56,7 +56,7 @@ class TableViewCell: UITableViewCell {
 //		}
 	}
 	
-	func setupCell(with item: Item, editHandler: @escaping (TableViewCell) -> Void) {
+	func setupCell(with item: Item, editHandler: @escaping (TodoTableViewCell) -> Void) {
 		self.item = item
 		self.label.text = item.title
 		self.label.textColor = item.isDone ? .gray : .black
