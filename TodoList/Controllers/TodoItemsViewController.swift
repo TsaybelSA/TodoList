@@ -60,7 +60,7 @@ class TodoItemsViewController: UIViewController {
 		tableView.delegate = self
 		tableView.dataSource = self
 		tableView.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
-		tableView.rowHeight = 50
+		tableView.rowHeight = 60
 		tableView.allowsSelectionDuringEditing = true
 		
 		setupToHideKeyboardOnTapOnView()

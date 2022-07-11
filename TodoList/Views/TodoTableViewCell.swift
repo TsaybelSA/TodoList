@@ -26,6 +26,7 @@ class TodoTableViewCell: UITableViewCell {
 			label.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 20),
 			label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 			infoButton.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 10),
+			infoButton.widthAnchor.constraint(equalToConstant: 30),
 			infoButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
 			infoButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
 		])
@@ -73,6 +74,7 @@ class TodoTableViewCell: UITableViewCell {
 	lazy private var label: UILabel = {
 		let label = UILabel(frame: .zero)
 		label.font = UIFont.systemFont(ofSize: 20)
+		label.numberOfLines = 2
 		label.translatesAutoresizingMaskIntoConstraints = false
 		return label
 	}()
