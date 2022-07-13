@@ -10,7 +10,6 @@ import UIKit
 
 extension UIView {
 	func setConstraintsTo(top: CGFloat, bottom: CGFloat, leading: CGFloat, trailing: CGFloat) -> Self {
-		
 		return self
 	}
 }

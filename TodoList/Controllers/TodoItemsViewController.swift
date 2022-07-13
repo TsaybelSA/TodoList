@@ -22,7 +22,7 @@ class TodoItemsViewController: UIViewController {
 		
 		self.selectedCategory = selectedCategory
 		
-		items = selectedCategory.items.sorted(byKeyPath: "id")
+		items = selectedCategory.items.sorted(byKeyPath: "index")
 
 		super.init(nibName: nil, bundle: nil)
 
@@ -125,7 +125,7 @@ class TodoItemsViewController: UIViewController {
 			guard text != " " && text != "" else { return }
 			let newItem = TodoItem()
 			newItem.name = text
-			newItem.id = min(0, self.selectedCategory.items.count)
+			newItem.index = min(0, self.selectedCategory.items.count)
 			self.saveItem(newItem)
 
 		}
@@ -148,7 +148,7 @@ class TodoItemsViewController: UIViewController {
 	}
 	
 	private func loadItems() {
-		items = selectedCategory.items.sorted(byKeyPath: "id")
+		items = selectedCategory.items.sorted(byKeyPath: "index")
 	}
 }
 
@@ -170,27 +170,19 @@ extension TodoItemsViewController: UITableViewDelegate {
 		return true
 	}
 	//Moving rows
-//	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-//		let itemToMove = items[sourceIndexPath.row]
-//		let newInstance = TodoItem()
-//		newInstance.name = itemToMove.name
-//		newInstance.id = destinationIndexPath.row
-//
-//		do {
-//			try realm.write {
-//				selectedCategory.items.append(newInstance)
-//				realm.delete(itemToMove)
-//
-//
-////				for (index, item) in items.enumerated() {
-////					item.id = index
-////					print("item name: \(item.name), id: \(item.id)")
-////				}
-//			}
-//		} catch {
-//			print("Error writing data to Realm database \(error)")
-//		}
-//	}
+	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+		let newInstance = TodoItem()
+		newInstance.name = items[sourceIndexPath.row].name
+		newInstance.index = destinationIndexPath.row
+		
+		do {
+			try self.realm.write {
+				items.moveObject(from: sourceIndexPath.row, to: destinationIndexPath.row)
+			}
+		} catch {
+			print("Failed to update data: \(error)")
+		}
+	}
 	
 	
 	//edit todo item
@@ -198,7 +190,7 @@ extension TodoItemsViewController: UITableViewDelegate {
 //		let vc = EditCellViewController()
 //		vc.item = cell.item
 //		vc.complition = { [weak self] todoItem in
-//			if let itemIndex = self?.items.firstIndex(where: { $0.id == todoItem.id }) {
+//			if let itemIndex = self?.items.firstIndex(where: { $0.index == todoItem.index }) {
 //				self?.items[itemIndex].title = todoItem.title
 //				self?.saveItems()
 //			}
@@ -243,7 +235,7 @@ extension TodoItemsViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		guard searchBar.text != "" else { loadItems(); return }
 		
-		items = selectedCategory.items.filter("name CONTAINS[cd] %@", searchText).sorted(byKeyPath: "id")
+		items = selectedCategory.items.filter("name CONTAINS[cd] %@", searchText).sorted(byKeyPath: "index")
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

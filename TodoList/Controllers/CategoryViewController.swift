@@ -21,7 +21,7 @@ class CategoryViewController: UIViewController {
 		self.realmConfiguration = realmConfiguration
 		   
 	   // Access all tasks in the realm, sorted by _id so that the ordering is defined.
-	   categories = realm.objects(Category.self).sorted(byKeyPath: "id")
+	   categories = realm.objects(Category.self).sorted(byKeyPath: "index")
 
 
 		super.init(nibName: nil, bundle: nil)
@@ -125,7 +125,7 @@ class CategoryViewController: UIViewController {
 				try self.realm.write {
 					let newCategory = Category()
 					newCategory.name = text
-					newCategory.id = min(0, self.categories.count)
+					newCategory.index = min(0, self.categories.count)
 					self.realm.add(newCategory)
 				}
 			} catch {
@@ -152,7 +152,7 @@ class CategoryViewController: UIViewController {
 //
 //	private func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
 //		do {
-//			request.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+//			request.sortDescriptors = [NSSortDescriptor(key: "index", ascending: true)]
 //			categories = try context.fetch(request)
 //		} catch {
 //			print("Failed to fetch data from context! \(error)")
@@ -179,15 +179,9 @@ extension CategoryViewController: UITableViewDelegate {
 	
 	//Moving rows
 	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-		let category = categories[sourceIndexPath.row]
 		do {
 			try self.realm.write {
-				realm.delete(category)
-				category.id = destinationIndexPath.row
-				realm.add(category)
-				for (index, item) in categories.enumerated() {
-					item.id = index
-				}
+				categories.moveObject(from: sourceIndexPath.row, to: destinationIndexPath.row)
 			}
 		} catch {
 			print("Error writing data to Realm database \(error)")

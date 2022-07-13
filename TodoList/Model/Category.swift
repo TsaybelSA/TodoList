@@ -8,8 +8,8 @@
 import Foundation
 import RealmSwift
 
-class Category: Object {
+class Category: Object, IndexableObject {
 	@Persisted var name: String = ""
-	@Persisted var id: Int = 0
+	@Persisted var index: Int = 0
 	@Persisted var items: List<TodoItem>
 }

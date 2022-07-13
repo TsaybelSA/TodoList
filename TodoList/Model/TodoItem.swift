@@ -8,9 +8,9 @@
 import Foundation
 import RealmSwift
 
-class TodoItem: Object {
+class TodoItem: Object, IndexableObject {
 	@Persisted var name: String = ""
 	@Persisted var isDone: Bool = false
-	@Persisted var id: Int = 0
+	@Persisted var index: Int = 0
 	@Persisted var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
 }
