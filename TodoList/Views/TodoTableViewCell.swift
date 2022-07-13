@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import RealmSwift
 
 class TodoTableViewCell: UITableViewCell {
 	
-	var item = Item()
+	var item = TodoItem()
 	
 	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -57,9 +58,9 @@ class TodoTableViewCell: UITableViewCell {
 //		}
 	}
 	
-	func setupCell(with item: Item, editHandler: @escaping (TodoTableViewCell) -> Void) {
+	func setupCell(with item: TodoItem, editHandler: @escaping (TodoTableViewCell) -> Void) {
 		self.item = item
-		self.label.text = item.title
+		self.label.text = item.name
 		self.label.textColor = item.isDone ? .gray : .black
 		self.selectionImage.image = UIImage(systemName: item.isDone ? "circle.fill" : "circle.dashed")
 		self.editHandler = editHandler

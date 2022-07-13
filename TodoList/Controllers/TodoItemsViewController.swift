@@ -6,24 +6,61 @@
 //
 
 import SwiftUI
-import CoreData
+import RealmSwift
 
 class TodoItemsViewController: UIViewController {
 	
 	var selectedCategory = Category()
 	
-	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+	let realm: Realm
+	var notificationToken: NotificationToken?
 	
-	var items = [Item]()
+	var items: Results<TodoItem>
 	
-	convenience init(_ category: Category) {
-		self.init()
-		self.selectedCategory = category
+	required init(realmConfiguration: Realm.Configuration, selectedCategory: Category) {
+		self.realm = try! Realm(configuration: realmConfiguration)
+		
+		self.selectedCategory = selectedCategory
+		
+		items = selectedCategory.items.sorted(byKeyPath: "id")
+
+		super.init(nibName: nil, bundle: nil)
+
+		// Observe the tasks for changes. Hang on to the returned notification token.
+		notificationToken = items.observe { [weak self] (changes) in
+			guard let tableView = self?.tableView else { return }
+			switch changes {
+			case .initial:
+				// Results are now populated and can be accessed without blocking the UI
+				tableView.reloadData()
+			case .update(_, let deletions, let insertions, let modifications):
+				// Query results have changed, so apply them to the UITableView.
+				tableView.performBatchUpdates({
+					// It's important to be sure to always update a table in this order:
+					// deletions, insertions, then updates. Otherwise, you could be unintentionally
+					// updating at the wrong index!
+					tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0) }),
+						with: .automatic)
+					tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
+						with: .automatic)
+					tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
+						with: .automatic)
+				})
+			case .error(let error):
+				// An error occurred while opening the Realm file on the background worker thread
+				fatalError("\(error)")
+			}
+		}
 	}
+	
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .white
-		title = "\(selectedCategory.name!)"
+		title = "\(selectedCategory.name)"
 		
 		//Long Press gesture to edit
 		let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -31,7 +68,6 @@ class TodoItemsViewController: UIViewController {
 		self.tableView.addGestureRecognizer(longPressGesture)
 		
 		setupView()
-		loadItems()
 	}
 	
 	private let tableView: UITableView = {
@@ -87,14 +123,11 @@ class TodoItemsViewController: UIViewController {
 		let confirmAction = UIAlertAction(title: "Add Item", style: .default) { _ in
 			guard let text = ac.textFields!.first?.text else { return }
 			guard text != " " && text != "" else { return }
-			let newItem = Item(context: self.context)
-			newItem.title = text
-			newItem.isDone = false
-			let safeIndex = NSNumber(integerLiteral: min(0, self.items.count))
-			newItem.id = safeIndex
-			newItem.parentCategory = self.selectedCategory
-			self.items.append(newItem)
-			self.saveItems()
+			let newItem = TodoItem()
+			newItem.name = text
+			newItem.id = min(0, self.selectedCategory.items.count)
+			self.saveItem(newItem)
+
 		}
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
 		ac.addAction(confirmAction)
@@ -104,34 +137,18 @@ class TodoItemsViewController: UIViewController {
 	
 	//MARK: - Model Manipulation Methods
 	
-	private func saveItems() {
+	private func saveItem(_ newItem: TodoItem) {
 		do {
-			try context.save()
-			print("Saved")
+			try self.realm.write {
+				self.selectedCategory.items.append(newItem)
+			}
 		} catch {
-			print("Failed to save context: \(error)")
+			print("Error writing data to Realm database \(error)")
 		}
-		tableView.reloadData()
 	}
 	
-	private func loadItems(with searchPredicate: NSPredicate? = nil) {
-		do {
-			guard let name = selectedCategory.name else { return }
-			
-			let request: NSFetchRequest<Item> = Item.fetchRequest()
-			let categoryPredicate = NSPredicate(format: "parentCategory.name == %@", name)
-			if let searchPredicate = searchPredicate {
-				request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, searchPredicate])
-			} else {
-				request.predicate = categoryPredicate
-			}
-			request.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
-			
-			items = try context.fetch(request)
-		} catch {
-			print("Failed to fetch data from context! \(error)")
-		}
-		tableView.reloadData()
+	private func loadItems() {
+		items = selectedCategory.items.sorted(byKeyPath: "id")
 	}
 }
 
@@ -140,7 +157,6 @@ class TodoItemsViewController: UIViewController {
 extension TodoItemsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		items[indexPath.row].isDone.toggle()
-		saveItems()
 	}
 
 	override func setEditing(_ editing: Bool, animated: Bool) {
@@ -154,35 +170,52 @@ extension TodoItemsViewController: UITableViewDelegate {
 		return true
 	}
 	//Moving rows
-	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-		let item = items[sourceIndexPath.row]
-		items.remove(at: sourceIndexPath.row)
-		items.insert(item, at: destinationIndexPath.row)
-		for (index, item) in items.enumerated() {
-			item.id = NSNumber(integerLiteral: index)
-		}
-		saveItems()
-	}
+//	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+//		let itemToMove = items[sourceIndexPath.row]
+//		let newInstance = TodoItem()
+//		newInstance.name = itemToMove.name
+//		newInstance.id = destinationIndexPath.row
+//
+//		do {
+//			try realm.write {
+//				selectedCategory.items.append(newInstance)
+//				realm.delete(itemToMove)
+//
+//
+////				for (index, item) in items.enumerated() {
+////					item.id = index
+////					print("item name: \(item.name), id: \(item.id)")
+////				}
+//			}
+//		} catch {
+//			print("Error writing data to Realm database \(error)")
+//		}
+//	}
+	
 	
 	//edit todo item
 	private func editCell(_ cell: TodoTableViewCell) -> Void {
-		let vc = EditCellViewController()
-		vc.item = cell.item
-		vc.complition = { [weak self] todoItem in
-			if let itemIndex = self?.items.firstIndex(where: { $0.id == todoItem.id }) {
-				self?.items[itemIndex].title = todoItem.title
-				self?.saveItems()
-			}
-
-		}
-		present(vc, animated: true)
+//		let vc = EditCellViewController()
+//		vc.item = cell.item
+//		vc.complition = { [weak self] todoItem in
+//			if let itemIndex = self?.items.firstIndex(where: { $0.id == todoItem.id }) {
+//				self?.items[itemIndex].title = todoItem.title
+//				self?.saveItems()
+//			}
+//
+//		}
+//		present(vc, animated: true)
 	}
 	
 	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 		let deleteAction = UIContextualAction(style: .destructive, title: "Delete") {_,_,_ in
-			self.context.delete(self.items[indexPath.row])
-			self.items.remove(at: indexPath.row)
-			self.saveItems()
+			do {
+				try self.realm.write {
+					self.realm.delete(self.items[indexPath.row])
+				}
+			} catch {
+				print("Error deleting item from Realm database \(error)")
+			}
 		}
 		return UISwipeActionsConfiguration(actions: [deleteAction])
 	}
@@ -209,8 +242,8 @@ extension TodoItemsViewController: UITableViewDataSource {
 extension TodoItemsViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		guard searchBar.text != "" else { loadItems(); return }
-		let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-		loadItems(with: predicate)
+		
+		items = selectedCategory.items.filter("name CONTAINS[cd] %@", searchText).sorted(byKeyPath: "id")
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

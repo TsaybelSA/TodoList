@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RealmSwift
+
 
 class CategoryTableViewCell: UITableViewCell {
 	

@@ -9,9 +9,9 @@ import UIKit
 
 class EditCellViewController: UIViewController {
 	
-	var item: Item!
+	var item: TodoItem!
 	
-	var complition: (Item) -> Void = { _ in}
+	var complition: (TodoItem) -> Void = { _ in}
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +36,7 @@ class EditCellViewController: UIViewController {
 	
 	lazy private var textField: UITextField = {
 		let textField = UITextField()
-		textField.text = item.title
+		textField.text = item.name
 		textField.backgroundColor = .lightGray
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.makeBorderedWithShadow()
@@ -63,7 +63,7 @@ class EditCellViewController: UIViewController {
 extension EditCellViewController: UITextFieldDelegate {
 	func textFieldDidEndEditing(_ textField: UITextField) {
 		guard let text = textField.text else { return }
-		item.title = text
+		item.name = text
 		complition(item)
 		print("End edit")
 	}
