@@ -16,31 +16,21 @@ class CategoryViewController: UIViewController {
 	
 	var categories: Results<Category>
 		
-	required init(realmConfiguration: Realm.Configuration, title: String) {
+	required init(realmConfiguration: Realm.Configuration) {
 		self.realm = try! Realm(configuration: realmConfiguration)
 		self.realmConfiguration = realmConfiguration
 		   
-	   // Access all tasks in the realm, sorted by _id so that the ordering is defined.
-	   categories = realm.objects(Category.self).sorted(byKeyPath: "index")
-
+		categories = realm.objects(Category.self).sorted(byKeyPath: "index")
 
 		super.init(nibName: nil, bundle: nil)
-
-		self.title = title
-
-		// Observe the tasks for changes. Hang on to the returned notification token.
+		
 		notificationToken = categories.observe { [weak self] (changes) in
 			guard let tableView = self?.tableView else { return }
 			switch changes {
 			case .initial:
-				// Results are now populated and can be accessed without blocking the UI
 				tableView.reloadData()
 			case .update(_, let deletions, let insertions, let modifications):
-				// Query results have changed, so apply them to the UITableView.
 				tableView.performBatchUpdates({
-					// It's important to be sure to always update a table in this order:
-					// deletions, insertions, then updates. Otherwise, you could be unintentionally
-					// updating at the wrong index!
 					tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0) }),
 						with: .automatic)
 					tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
@@ -49,7 +39,6 @@ class CategoryViewController: UIViewController {
 						with: .automatic)
 				})
 			case .error(let error):
-				// An error occurred while opening the Realm file on the background worker thread
 				fatalError("\(error)")
 			}
 		}
@@ -60,33 +49,30 @@ class CategoryViewController: UIViewController {
 	}
 	
 	deinit {
-		// Always invalidate any notification tokens when you are done with them.
 		notificationToken?.invalidate()
 	}
 	
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		view.backgroundColor = .white
-		title = "What Todo"
-		navigationController?.navigationBar.prefersLargeTitles = true
-		
 		print(Realm.Configuration.defaultConfiguration.fileURL)
 		
 		setupView()
     }
 	
 	private let tableView: UITableView = {
-		let tableView = UITableView()
-		tableView.translatesAutoresizingMaskIntoConstraints = false
-		return tableView
-	}()
+		$0.translatesAutoresizingMaskIntoConstraints = false
+	return $0 }(UITableView())
 	
 	
 	//MARK: - Setup view appearance
 	
 	private func setupView() {
+		view.backgroundColor = .white
 		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
+		navigationController?.navigationBar.prefersLargeTitles = true
+		title = "What Todo"
+
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
 		navigationItem.leftBarButtonItem = editButtonItem
 		
@@ -138,27 +124,6 @@ class CategoryViewController: UIViewController {
 		present(ac, animated: true)
 	}
 	
-	//MARK: - Model Manipulation Methods
-	
-//	private func saveCategories() {
-//		do {
-//			try context.save()
-//			print("Saved")
-//		} catch {
-//			print("Failed to save context: \(error)")
-//		}
-//		tableView.reloadData()
-//	}
-//
-//	private func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
-//		do {
-//			request.sortDescriptors = [NSSortDescriptor(key: "index", ascending: true)]
-//			categories = try context.fetch(request)
-//		} catch {
-//			print("Failed to fetch data from context! \(error)")
-//		}
-//		tableView.reloadData()
-//	}
 	
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
@@ -171,13 +136,13 @@ class CategoryViewController: UIViewController {
 
 extension CategoryViewController: UITableViewDelegate {
 	
-	// prepare and push todoItemsViewController
+	//MARK: - Push todoItemsViewController
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let vc = TodoItemsViewController(realmConfiguration: realmConfiguration, selectedCategory: categories[indexPath.row])
 		navigationController?.pushViewController(vc, animated: true)
 	}
 	
-	//Moving rows
+	//Move rows
 	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
 		do {
 			try self.realm.write {
@@ -189,6 +154,7 @@ extension CategoryViewController: UITableViewDelegate {
 
 	}
 	
+	//swipe to delete
 	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
 		let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _,_,_ in
 			do {

@@ -13,12 +13,15 @@ class TodoItemsViewController: UIViewController {
 	var selectedCategory = Category()
 	
 	let realm: Realm
+	//if need this realm configuration, need to add it to appDelegate
+	let realmConfiguration: Realm.Configuration
 	var notificationToken: NotificationToken?
 	
 	var items: Results<TodoItem>
 	
 	required init(realmConfiguration: Realm.Configuration, selectedCategory: Category) {
 		self.realm = try! Realm(configuration: realmConfiguration)
+		self.realmConfiguration = realmConfiguration
 		
 		self.selectedCategory = selectedCategory
 		
@@ -26,19 +29,13 @@ class TodoItemsViewController: UIViewController {
 
 		super.init(nibName: nil, bundle: nil)
 
-		// Observe the tasks for changes. Hang on to the returned notification token.
 		notificationToken = items.observe { [weak self] (changes) in
 			guard let tableView = self?.tableView else { return }
 			switch changes {
 			case .initial:
-				// Results are now populated and can be accessed without blocking the UI
 				tableView.reloadData()
 			case .update(_, let deletions, let insertions, let modifications):
-				// Query results have changed, so apply them to the UITableView.
 				tableView.performBatchUpdates({
-					// It's important to be sure to always update a table in this order:
-					// deletions, insertions, then updates. Otherwise, you could be unintentionally
-					// updating at the wrong index!
 					tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0) }),
 						with: .automatic)
 					tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }),
@@ -47,10 +44,13 @@ class TodoItemsViewController: UIViewController {
 						with: .automatic)
 				})
 			case .error(let error):
-				// An error occurred while opening the Realm file on the background worker thread
 				fatalError("\(error)")
 			}
 		}
+	}
+	
+	deinit {
+		notificationToken?.invalidate()
 	}
 	
 	required init?(coder: NSCoder) {
@@ -71,16 +71,15 @@ class TodoItemsViewController: UIViewController {
 	}
 	
 	private let tableView: UITableView = {
-		let tableView = UITableView()
-		tableView.translatesAutoresizingMaskIntoConstraints = false
-		return tableView
-	}()
+		$0.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
+		$0.rowHeight = 60
+		$0.allowsSelectionDuringEditing = true
+		$0.translatesAutoresizingMaskIntoConstraints = false
+		return $0 }(UITableView())
 	
 	private let searchBar: UISearchBar = {
-		let searchBar = UISearchBar()
-		searchBar.translatesAutoresizingMaskIntoConstraints = false
-		return searchBar
-	}()
+		$0.translatesAutoresizingMaskIntoConstraints = false
+	return $0 }(UISearchBar())
 	
 	@objc func handleLongPress(longPressGesture: UILongPressGestureRecognizer) {
 		isEditing = true
@@ -95,9 +94,6 @@ class TodoItemsViewController: UIViewController {
 		searchBar.delegate = self
 		tableView.delegate = self
 		tableView.dataSource = self
-		tableView.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
-		tableView.rowHeight = 60
-		tableView.allowsSelectionDuringEditing = true
 		
 		setupToHideKeyboardOnTapOnView()
 		view.addSubview(searchBar)
@@ -156,7 +152,13 @@ class TodoItemsViewController: UIViewController {
 
 extension TodoItemsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		items[indexPath.row].isDone.toggle()
+		do {
+			try realm.write {
+				items[indexPath.row].isDone.toggle()
+			}
+		} catch {
+			print("Error writing data to Realm database \(error)")
+		}
 	}
 
 	override func setEditing(_ editing: Bool, animated: Bool) {
@@ -169,6 +171,7 @@ extension TodoItemsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
+	
 	//Moving rows
 	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
 		let newInstance = TodoItem()
@@ -184,19 +187,10 @@ extension TodoItemsViewController: UITableViewDelegate {
 		}
 	}
 	
-	
 	//edit todo item
 	private func editCell(_ cell: TodoTableViewCell) -> Void {
-//		let vc = EditCellViewController()
-//		vc.item = cell.item
-//		vc.complition = { [weak self] todoItem in
-//			if let itemIndex = self?.items.firstIndex(where: { $0.index == todoItem.index }) {
-//				self?.items[itemIndex].title = todoItem.title
-//				self?.saveItems()
-//			}
-//
-//		}
-//		present(vc, animated: true)
+		let vc = EditCellViewController(cellItem: cell.item, realmConfiguration: realmConfiguration)
+		present(vc, animated: true)
 	}
 	
 	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

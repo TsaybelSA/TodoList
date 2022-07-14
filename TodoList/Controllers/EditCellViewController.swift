@@ -6,12 +6,23 @@
 //
 
 import UIKit
+import RealmSwift
 
 class EditCellViewController: UIViewController {
 	
-	var item: TodoItem!
+	let realm: Realm
+	var item: TodoItem
+		
+	required init(cellItem: TodoItem, realmConfiguration: Realm.Configuration) {
+		self.realm = try! Realm(configuration: realmConfiguration)
+		self.item = cellItem
+		super.init(nibName: nil, bundle: nil)
+	}
 	
-	var complition: (TodoItem) -> Void = { _ in}
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,25 +46,21 @@ class EditCellViewController: UIViewController {
     }
 	
 	lazy private var textField: UITextField = {
-		let textField = UITextField()
-		textField.text = item.name
-		textField.backgroundColor = .lightGray
-		textField.translatesAutoresizingMaskIntoConstraints = false
-		textField.makeBorderedWithShadow()
-		textField.setLeftPaddingPoints(10)
-		textField.font = UIFont.systemFont(ofSize: 22)
-		textField.delegate = self
-		return textField
-	}()
+		$0.text = item.name
+		$0.backgroundColor = .lightGray
+		$0.translatesAutoresizingMaskIntoConstraints = false
+		$0.makeBorderedWithShadow()
+		$0.setLeftPaddingPoints(10)
+		$0.font = UIFont.systemFont(ofSize: 22)
+		$0.delegate = self
+	return $0 }(UITextField())
 	
 	lazy private var dissmissViewButton: UIButton = {
-		let button = UIButton(type: .system)
 		let buttonImage = UIImage(systemName: "x.circle")?.withTintColor(.gray, renderingMode: .alwaysOriginal)
-		button.setImage(buttonImage, for: .normal)
-		button.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
-		button.translatesAutoresizingMaskIntoConstraints = false
-		return button
-	}()
+		$0.setImage(buttonImage, for: .normal)
+		$0.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+		$0.translatesAutoresizingMaskIntoConstraints = false
+	return $0 }(UIButton(type: .system))
 	
 	@objc func dismissView() {
 		dismiss(animated: true)
@@ -63,8 +70,13 @@ class EditCellViewController: UIViewController {
 extension EditCellViewController: UITextFieldDelegate {
 	func textFieldDidEndEditing(_ textField: UITextField) {
 		guard let text = textField.text else { return }
-		item.name = text
-		complition(item)
+		do {
+			try realm.write {
+				item.name = text
+			}
+		} catch {
+			print("Error deleting item from Realm database \(error)")
+		}
 		print("End edit")
 	}
 }

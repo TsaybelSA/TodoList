@@ -104,7 +104,7 @@ class WelcomeViewController: UIViewController {
 		 config.fileURL!.appendPathComponent("project=\(self.username!)")
 		 config.fileURL!.appendPathExtension("realm")
 		 navigationController!.pushViewController(
-			 CategoryViewController(realmConfiguration: config, title: "\(username!)'s Tasks"),
+			 CategoryViewController(realmConfiguration: config),
 			 animated: true
 		 )
     }
