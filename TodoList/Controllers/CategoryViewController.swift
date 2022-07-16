@@ -69,7 +69,7 @@ class CategoryViewController: UIViewController {
 	
 	private func setupView() {
 		view.backgroundColor = .white
-		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
+		navigationController?.navigationBar.barTintColor = K.CustomColors.iconColor
 		navigationController?.navigationBar.prefersLargeTitles = true
 		title = "What Todo"
 

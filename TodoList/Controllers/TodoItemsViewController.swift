@@ -98,7 +98,7 @@ class TodoItemsViewController: UIViewController {
 	//MARK: - Setup view appearance
 	
 	private func setupView() {
-		navigationController?.navigationBar.barTintColor = K.Colors.lightBlue
+		navigationController?.navigationBar.barTintColor = K.CustomColors.iconColor
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
 		
 		searchBar.delegate = self

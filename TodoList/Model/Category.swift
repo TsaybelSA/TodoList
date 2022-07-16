@@ -11,6 +11,6 @@ import RealmSwift
 class Category: Object, IndexableObject {
 	@Persisted var name: String = ""
 	@Persisted var index: Int = 0
-	@Persisted var image: String?
+	@Persisted var icon: String?
 	@Persisted var items: List<TodoItem>
 }

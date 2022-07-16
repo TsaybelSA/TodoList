@@ -16,7 +16,8 @@ class ImageCell: UICollectionViewCell {
 	
 	private lazy var imageView: UIImageView = {
 		let imageView = UIImageView()
-		imageView.contentMode = .scaleToFill
+		imageView.tintColor = K.CustomColors.iconColor
+		imageView.contentMode = .scaleAspectFit
 		imageView.translatesAutoresizingMaskIntoConstraints = false
 		return imageView
 	}()
@@ -29,7 +30,7 @@ class ImageCell: UICollectionViewCell {
 	
 	private func setupViews() {
 		contentView.clipsToBounds = true
-		contentView.layer.cornerRadius = Constants.contentViewCornerRadius
+		self.layer.cornerRadius = Constants.contentViewCornerRadius
 
 		contentView.addSubview(imageView)
 	}
@@ -43,13 +44,29 @@ class ImageCell: UICollectionViewCell {
 		])
 	}
 	
+	override var isSelected: Bool {
+		didSet{
+			if self.isSelected {
+				UIView.animate(withDuration: Constants.duration) { // for animation effect
+					self.backgroundColor = K.CustomColors.iconColor
+					self.imageView.tintColor = .white
+				}
+			}
+			else {
+				UIView.animate(withDuration: Constants.duration) { // for animation effect
+					self.backgroundColor = .clear
+					self.imageView.tintColor = K.CustomColors.iconColor
+				}
+			}
+		}
+	}
+	
 	private enum Constants {
 		// MARK: contentView layout constants
-		static let contentViewCornerRadius: CGFloat = 4.0
+		static let contentViewCornerRadius: CGFloat = 8.0
 
-		// MARK: Generic layout constants
-		static let verticalSpacing: CGFloat = 8.0
-		static let horizontalPadding: CGFloat = 16.0
+		// MARK: Animation duration
+		static let duration: Double = 0.3
 	}
 	
 	required init?(coder: NSCoder) {
@@ -57,8 +74,7 @@ class ImageCell: UICollectionViewCell {
 	}
 	
 	func setup(with image: UIImage) {
-		imageView.image = image.withTintColor(.green)
-		
+		imageView.image = image
 	}
 }
 

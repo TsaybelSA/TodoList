@@ -15,8 +15,8 @@ extension UIView {
 }
 
 struct K {
-	struct Colors {
-		static let lightBlue = UIColor(named: "lightBlue")
+	struct CustomColors {
+		static let iconColor = UIColor(named: "iconColor")!
 	}
 }
 

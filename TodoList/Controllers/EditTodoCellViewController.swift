@@ -38,6 +38,7 @@ class EditTodoCellViewController: UIViewController {
 			dissmissViewButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
 			dissmissViewButton.widthAnchor.constraint(equalToConstant: 30),
 			dissmissViewButton.heightAnchor.constraint(equalToConstant: 30),
+			
 			textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
 			textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
 			textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),

@@ -17,16 +17,15 @@ class CategoryTableViewCell: UITableViewCell {
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
-		contentView.addSubview(themeImage)
+		contentView.addSubview(themeImageView)
 		contentView.addSubview(infoButton)
 		contentView.addSubview(titleLabel)
+		
 		NSLayoutConstraint.activate([
-			themeImage.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-			themeImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-			//MARK: - change from 0 value when apply images
-			themeImage.widthAnchor.constraint(equalToConstant: 0),
-			themeImage.heightAnchor.constraint(equalToConstant: 0),
-			titleLabel.leadingAnchor.constraint(equalTo: themeImage.trailingAnchor, constant: 20),
+			themeImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+			themeImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+//			//MARK: - widthAnchor and heightAnchor change from 0 value when apply images
+			titleLabel.leadingAnchor.constraint(equalTo: themeImageView.trailingAnchor, constant: 20),
 			titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 			infoButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 10),
 			infoButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -38,14 +37,24 @@ class CategoryTableViewCell: UITableViewCell {
 		titleLabel.text = category.name
 		self.category = category
 		self.editHandler = editHandler
+		if category.icon == nil {
+			themeImageView.widthAnchor.constraint(equalToConstant: 0).isActive = true
+			themeImageView.heightAnchor.constraint(equalToConstant: 0).isActive = true
+		} else {
+			themeImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+			themeImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+			themeImageView.image = UIImage(systemName: category.icon!)
+			themeImageView.tintColor = K.CustomColors.iconColor
+		}
 	}
 	
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 	
-	lazy private var themeImage: UIImageView = {
+	lazy private var themeImageView: UIImageView = {
 		let imageView = UIImageView()
+		imageView.contentMode = .scaleAspectFit
 		imageView.translatesAutoresizingMaskIntoConstraints = false
 		return imageView
 	}()
@@ -76,17 +85,28 @@ class CategoryTableViewCell: UITableViewCell {
 		if isEditing == true {
 			accessoryType = .none
 			infoButton.isHidden = false
-			UIButton.animate(withDuration: 0.2) {
+			UIButton.animate(withDuration: Constants.Animation.duration) {
 				self.infoButton.layer.opacity = 1
 			}
 		} else {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+			DispatchQueue.main.asyncAfter(deadline: .now() + Constants.Animation.timeToWait) {
 				self.infoButton.isHidden = true
 				self.accessoryType = .disclosureIndicator
 			}
-			UIButton.animate(withDuration: 0.2) {
+			UIButton.animate(withDuration: Constants.Animation.duration) {
 				self.infoButton.layer.opacity = 0
 			}
+		}
+	}
+	
+	private enum Constants {
+		// MARK: contentView layout constants
+		static let contentViewCornerRadius: CGFloat = 8.0
+		
+		// MARK: Animation constants
+		struct Animation {
+			static let timeToWait: Double = 0.3
+			static let duration: Double = 0.2
 		}
 	}
 	
