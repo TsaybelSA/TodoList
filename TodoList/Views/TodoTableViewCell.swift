@@ -12,7 +12,6 @@ class TodoTableViewCell: UITableViewCell {
 	
 	var item = TodoItem()
 	
-	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
@@ -62,7 +61,9 @@ class TodoTableViewCell: UITableViewCell {
 		self.item = item
 		self.label.text = item.name
 		self.label.textColor = item.isDone ? .gray : .black
+		self.label.layer.opacity = item.isDone ? 0.5 : 1
 		self.selectionImage.image = UIImage(systemName: item.isDone ? "circle.fill" : "circle.dashed")
+		self.selectionImage.layer.opacity = item.isDone ? 0.5 : 1
 		self.editHandler = editHandler
 	}
 	

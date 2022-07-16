@@ -20,7 +20,13 @@ class WelcomeViewController: UIViewController {
             return usernameField.text
         }
     }
-
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		//MARK: - Delete this before production
+		signIn()
+	}
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -28,7 +28,11 @@ class TodoItemsViewController: UIViewController {
 		items = selectedCategory.items.sorted(byKeyPath: "index")
 
 		super.init(nibName: nil, bundle: nil)
-
+		
+		createNotificationToken(for: items)
+	}
+	
+	func createNotificationToken(for object: Results<TodoItem>) {
 		notificationToken = items.observe { [weak self] (changes) in
 			guard let tableView = self?.tableView else { return }
 			switch changes {
@@ -43,6 +47,11 @@ class TodoItemsViewController: UIViewController {
 					tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }),
 						with: .automatic)
 				})
+				if let lastInsertedRow = insertions.last {
+					tableView.scrollToRow(at: IndexPath(item: lastInsertedRow, section: 0),
+										  at: .middle, animated: true)
+					print("last row: \(lastInsertedRow)")
+				}
 			case .error(let error):
 				fatalError("\(error)")
 			}
@@ -83,6 +92,7 @@ class TodoItemsViewController: UIViewController {
 	
 	@objc func handleLongPress(longPressGesture: UILongPressGestureRecognizer) {
 		isEditing = true
+//		self.searchBarCancelButtonClicked(searchBar)
 	}
 	
 	//MARK: - Setup view appearance
@@ -121,10 +131,10 @@ class TodoItemsViewController: UIViewController {
 			guard text != " " && text != "" else { return }
 			let newItem = TodoItem()
 			newItem.name = text
-			newItem.index = min(0, self.selectedCategory.items.count)
+			newItem.index = max(0, self.items.count)
 			self.saveItem(newItem)
-
 		}
+		print(items)
 		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
 		ac.addAction(confirmAction)
 		ac.addAction(cancelAction)
@@ -145,6 +155,7 @@ class TodoItemsViewController: UIViewController {
 	
 	private func loadItems() {
 		items = selectedCategory.items.sorted(byKeyPath: "index")
+		createNotificationToken(for: items)
 	}
 }
 
@@ -153,8 +164,16 @@ class TodoItemsViewController: UIViewController {
 extension TodoItemsViewController: UITableViewDelegate {
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		do {
+			let item = items[indexPath.row]
 			try realm.write {
-				items[indexPath.row].isDone.toggle()
+				item.isDone.toggle()
+			}
+			guard item.isDone else { return }
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+				guard let self = self else { return }
+				try! self.realm.write {
+					item.index = self.items.last!.index + 1
+				}
 			}
 		} catch {
 			print("Error writing data to Realm database \(error)")
@@ -174,10 +193,6 @@ extension TodoItemsViewController: UITableViewDelegate {
 	
 	//Moving rows
 	func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-		let newInstance = TodoItem()
-		newInstance.name = items[sourceIndexPath.row].name
-		newInstance.index = destinationIndexPath.row
-		
 		do {
 			try self.realm.write {
 				items.moveObject(from: sourceIndexPath.row, to: destinationIndexPath.row)
@@ -189,7 +204,7 @@ extension TodoItemsViewController: UITableViewDelegate {
 	
 	//edit todo item
 	private func editCell(_ cell: TodoTableViewCell) -> Void {
-		let vc = EditCellViewController(cellItem: cell.item, realmConfiguration: realmConfiguration)
+		let vc = EditTodoCellViewController(cellItem: cell.item, realmConfiguration: realmConfiguration)
 		present(vc, animated: true)
 	}
 	
@@ -217,8 +232,7 @@ extension TodoItemsViewController: UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "todoItemCell", for: indexPath) as! TodoTableViewCell
-		let item = items[indexPath.row]
-		cell.setupCell(with: item, editHandler: editCell)
+		cell.setupCell(with: items[indexPath.row], editHandler: editCell)
 		return cell
 	}
 }
@@ -230,6 +244,7 @@ extension TodoItemsViewController: UISearchBarDelegate {
 		guard searchBar.text != "" else { loadItems(); return }
 		
 		items = selectedCategory.items.filter("name CONTAINS[cd] %@", searchText).sorted(byKeyPath: "index")
+		createNotificationToken(for: items)
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

@@ -11,6 +11,9 @@ import RealmSwift
 
 class CategoryTableViewCell: UITableViewCell {
 	
+	var editHandler: (CategoryTableViewCell) -> Void = { _ in}
+	var category = Category()
+	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
@@ -31,8 +34,10 @@ class CategoryTableViewCell: UITableViewCell {
 		])
 	}
 	
-	func setupCell(with title: String) {
-		titleLabel.text = title
+	func setupCell(with category: Category, editHandler: @escaping (CategoryTableViewCell) -> Void) {
+		titleLabel.text = category.name
+		self.category = category
+		self.editHandler = editHandler
 	}
 	
 	required init?(coder: NSCoder) {
@@ -86,7 +91,7 @@ class CategoryTableViewCell: UITableViewCell {
 	}
 	
 	@objc func infoButtonPressed() {
-		
+		editHandler(self)
 	}
 
 }

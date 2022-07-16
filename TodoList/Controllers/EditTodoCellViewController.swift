@@ -1,5 +1,5 @@
 //
-//  EditCellViewController.swift
+//  EditTodoCellViewController.swift
 //  TodoList
 //
 //  Created by Сергей Цайбель on 05.07.2022.
@@ -8,7 +8,7 @@
 import UIKit
 import RealmSwift
 
-class EditCellViewController: UIViewController {
+class EditTodoCellViewController: UIViewController {
 	
 	let realm: Realm
 	var item: TodoItem
@@ -67,7 +67,7 @@ class EditCellViewController: UIViewController {
 	}
 }
 
-extension EditCellViewController: UITextFieldDelegate {
+extension EditTodoCellViewController: UITextFieldDelegate {
 	func textFieldDidEndEditing(_ textField: UITextField) {
 		guard let text = textField.text else { return }
 		do {

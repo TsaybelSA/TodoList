@@ -129,7 +129,6 @@ class CategoryViewController: UIViewController {
 		super.setEditing(editing, animated: animated)
 		tableView.setEditing(editing, animated: animated)
 	}
-	
 }
 
 //MARK: - Table View Methods
@@ -151,7 +150,6 @@ extension CategoryViewController: UITableViewDelegate {
 		} catch {
 			print("Error writing data to Realm database \(error)")
 		}
-
 	}
 	
 	//swipe to delete
@@ -177,7 +175,12 @@ extension CategoryViewController: UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath) as! CategoryTableViewCell
-		cell.setupCell(with: categories[indexPath.row].name)
+		cell.setupCell(with: categories[indexPath.row], editHandler: editCategory)
 		return cell
+	}
+	
+	func editCategory(_ cell: CategoryTableViewCell) -> Void {
+		let vc = EditCategoryVC(cellItem: cell.category, realmConfiguration: realmConfiguration)
+		present(vc, animated: true)
 	}
 }
