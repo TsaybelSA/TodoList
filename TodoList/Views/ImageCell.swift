@@ -49,7 +49,7 @@ class ImageCell: UICollectionViewCell {
 			if self.isSelected {
 				UIView.animate(withDuration: Constants.duration) { // for animation effect
 					self.backgroundColor = K.CustomColors.iconColor
-					self.imageView.tintColor = .white
+					self.imageView.tintColor = .systemBackground
 				}
 			}
 			else {

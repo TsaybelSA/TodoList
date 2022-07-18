@@ -41,34 +41,21 @@ class TodoTableViewCell: UITableViewCell {
 	override func setEditing(_ editing: Bool, animated: Bool) {
 		super.setEditing(editing, animated: animated)
 		self.selectionStyle = .none
-		
-//		if editing == true {
-//			UIImageView.animate(withDuration: 0.2) {
-//				self.selectionImage.transform = CGAffineTransform(translationX: 0, y: 0)
-//				self.label.transform = CGAffineTransform(translationX: 0, y: 0)
-//				self.infoButton.isHidden = true
-//			}
-//		} else {
-//			UIImageView.animate(withDuration: 0.2) {
-//				self.selectionImage.transform = CGAffineTransform(translationX: -100, y: 0)
-//				self.label.transform = CGAffineTransform(translationX: -50, y: 0)
-//				self.infoButton.isHidden = false
-//			}
-//		}
 	}
 	
 	func setupCell(with item: TodoItem, editHandler: @escaping (TodoTableViewCell) -> Void) {
 		self.item = item
 		self.label.text = item.name
-		self.label.textColor = item.isDone ? .gray : .black
+		self.label.textColor = item.isDone ? .gray : .label
 		self.label.layer.opacity = item.isDone ? 0.5 : 1
-		self.selectionImage.image = UIImage(systemName: item.isDone ? "circle.fill" : "circle.dashed")
+		self.selectionImage.image = UIImage(systemName: item.isDone ? "checkmark.circle.fill" : "circle.dashed")
 		self.selectionImage.layer.opacity = item.isDone ? 0.5 : 1
 		self.editHandler = editHandler
 	}
 	
 	lazy private var selectionImage: UIImageView = {
 		let imageView = UIImageView()
+		imageView.tintColor = K.CustomColors.iconColor
 		imageView.translatesAutoresizingMaskIntoConstraints = false
 		return imageView
 	}()
@@ -84,11 +71,12 @@ class TodoTableViewCell: UITableViewCell {
 	lazy private var infoButton: UIButton = {
 		let infoButton = UIButton(type: .system)
 		infoButton.setImage(UIImage(systemName: "info.circle"), for: .normal)
+		infoButton.tintColor = K.CustomColors.iconColor
 		infoButton.addTarget(self, action: #selector(infoButtonPressed), for: .touchUpInside)
 		infoButton.translatesAutoresizingMaskIntoConstraints = false
 		return infoButton
 	}()
-//
+	
 	@objc private func infoButtonPressed() {
 		editHandler(self)
 	}

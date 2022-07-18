@@ -14,6 +14,8 @@ class CategoryTableViewCell: UITableViewCell {
 	var editHandler: (CategoryTableViewCell) -> Void = { _ in}
 	var category = Category()
 	
+	var imageWidthAnchor: NSLayoutConstraint?
+	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
@@ -21,13 +23,20 @@ class CategoryTableViewCell: UITableViewCell {
 		contentView.addSubview(infoButton)
 		contentView.addSubview(titleLabel)
 		
+		imageWidthAnchor = themeImageView.widthAnchor.constraint(equalToConstant: 0)
+		imageWidthAnchor?.isActive = true
+		
 		NSLayoutConstraint.activate([
 			themeImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
 			themeImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-//			//MARK: - widthAnchor and heightAnchor change from 0 value when apply images
+			themeImageView.heightAnchor.constraint(equalToConstant: 40),
+			
+			//MARK: - widthAnchor and heightAnchor change from 0 value when apply image
 			titleLabel.leadingAnchor.constraint(equalTo: themeImageView.trailingAnchor, constant: 20),
 			titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-			infoButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 10),
+			titleLabel.trailingAnchor.constraint(equalTo: infoButton.leadingAnchor, constant: 10),
+			
+			infoButton.widthAnchor.constraint(equalToConstant: 30),
 			infoButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
 			infoButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
 		])
@@ -37,14 +46,18 @@ class CategoryTableViewCell: UITableViewCell {
 		titleLabel.text = category.name
 		self.category = category
 		self.editHandler = editHandler
+
 		if category.icon == nil {
-			themeImageView.widthAnchor.constraint(equalToConstant: 0).isActive = true
-			themeImageView.heightAnchor.constraint(equalToConstant: 0).isActive = true
+			imageWidthAnchor?.isActive = false
+			imageWidthAnchor = themeImageView.widthAnchor.constraint(equalToConstant: 0)
+			imageWidthAnchor?.isActive = true
 		} else {
-			themeImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-			themeImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
 			themeImageView.image = UIImage(systemName: category.icon!)
 			themeImageView.tintColor = K.CustomColors.iconColor
+			
+			imageWidthAnchor?.isActive = false
+			imageWidthAnchor = themeImageView.widthAnchor.constraint(equalToConstant: 40)
+			imageWidthAnchor?.isActive = true
 		}
 	}
 	
@@ -61,7 +74,7 @@ class CategoryTableViewCell: UITableViewCell {
 	
 	lazy private var titleLabel: UILabel = {
 		let label = UILabel(frame: .zero)
-		label.font = UIFont.systemFont(ofSize: 24)
+		label.font = UIFont.systemFont(ofSize: 22)
 		label.translatesAutoresizingMaskIntoConstraints = false
 		return label
 	}()
@@ -69,6 +82,8 @@ class CategoryTableViewCell: UITableViewCell {
 	lazy private var infoButton: UIButton = {
 		let infoButton = UIButton(type: .system)
 		infoButton.setImage(UIImage(systemName: "info.circle"), for: .normal)
+		infoButton.contentMode = .scaleAspectFill
+		infoButton.tintColor = K.CustomColors.iconColor
 		infoButton.addTarget(self, action: #selector(infoButtonPressed), for: .touchUpInside)
 		infoButton.translatesAutoresizingMaskIntoConstraints = false
 		return infoButton

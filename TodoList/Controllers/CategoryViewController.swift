@@ -68,8 +68,7 @@ class CategoryViewController: UIViewController {
 	//MARK: - Setup view appearance
 	
 	private func setupView() {
-		view.backgroundColor = .white
-		navigationController?.navigationBar.barTintColor = K.CustomColors.iconColor
+		view.backgroundColor = .systemBackground
 		navigationController?.navigationBar.prefersLargeTitles = true
 		title = "What Todo"
 
@@ -135,7 +134,7 @@ class CategoryViewController: UIViewController {
 
 extension CategoryViewController: UITableViewDelegate {
 	
-	//MARK: - Push todoItemsViewController
+	//	push todoItemsViewController
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let vc = TodoItemsViewController(realmConfiguration: realmConfiguration, selectedCategory: categories[indexPath.row])
 		navigationController?.pushViewController(vc, animated: true)

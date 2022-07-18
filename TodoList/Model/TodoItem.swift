@@ -12,5 +12,6 @@ class TodoItem: Object, IndexableObject {
 	@Persisted var name: String = ""
 	@Persisted var isDone: Bool = false
 	@Persisted var index: Int = 0
+	@Persisted var indexBeforeCompleted: Int?
 	@Persisted var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
 }

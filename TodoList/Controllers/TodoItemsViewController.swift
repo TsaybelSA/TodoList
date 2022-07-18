@@ -68,7 +68,7 @@ class TodoItemsViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		view.backgroundColor = .white
+		view.backgroundColor = .systemBackground
 		title = "\(selectedCategory.name)"
 		
 		//Long Press gesture to edit
@@ -92,13 +92,11 @@ class TodoItemsViewController: UIViewController {
 	
 	@objc func handleLongPress(longPressGesture: UILongPressGestureRecognizer) {
 		isEditing = true
-//		self.searchBarCancelButtonClicked(searchBar)
 	}
 	
 	//MARK: - Setup view appearance
 	
 	private func setupView() {
-		navigationController?.navigationBar.barTintColor = K.CustomColors.iconColor
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
 		
 		searchBar.delegate = self
@@ -167,12 +165,18 @@ extension TodoItemsViewController: UITableViewDelegate {
 			let item = items[indexPath.row]
 			try realm.write {
 				item.isDone.toggle()
+				if item.isDone {
+					item.indexBeforeCompleted = item.index
+				} else {
+					guard let index = item.indexBeforeCompleted else { return }
+					item.index = index
+				}
 			}
 			guard item.isDone else { return }
 			DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
 				guard let self = self else { return }
 				try! self.realm.write {
-					item.index = self.items.last!.index + 1
+					item.index += 1000000
 				}
 			}
 		} catch {

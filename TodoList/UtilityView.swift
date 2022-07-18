@@ -40,7 +40,6 @@ extension UITextField {
 		self.borderStyle = .none
 		self.layer.masksToBounds = false
 		self.layer.cornerRadius = cornerRadius ?? 10
-		self.layer.backgroundColor = UIColor.white.cgColor
 		self.layer.borderColor = UIColor.clear.cgColor
 		self.layer.shadowColor = UIColor.black.cgColor
 		self.layer.shadowOffset = CGSize(width: 0, height: 0)

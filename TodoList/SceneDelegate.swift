@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		window.makeKeyAndVisible()
 		let rootViewController = WelcomeViewController()
 		let navigationController = UINavigationController(rootViewController: rootViewController)
+		navigationController.navigationBar.tintColor = K.CustomColors.iconColor
 		window.rootViewController = navigationController
 		self.window = window
 	}

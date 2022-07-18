@@ -32,7 +32,7 @@ class EditCategoryVC: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		view.backgroundColor = .white
+		view.backgroundColor = .secondarySystemBackground
 		
 		setupToHideKeyboardOnTapOnView()
 		textField.delegate = self
@@ -95,6 +95,7 @@ class EditCategoryVC: UIViewController {
 		let collectionViewLayout = UICollectionViewFlowLayout()
 		let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: collectionViewLayout)
 		collectionView.translatesAutoresizingMaskIntoConstraints = false
+		collectionView.backgroundColor = .secondarySystemBackground
 		return collectionView
 	}()
 	
@@ -110,11 +111,12 @@ class EditCategoryVC: UIViewController {
 	private lazy var textField: UITextField = {
 		let textField = UITextField()
 		textField.text = category.name
-		textField.backgroundColor = .lightGray
+		textField.backgroundColor = .systemBackground
+		textField.font = UIFont.systemFont(ofSize: 22)
+		textField.textColor = .label
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.makeBorderedWithShadow()
 		textField.setLeftPaddingPoints(10)
-		textField.font = UIFont.systemFont(ofSize: 22)
 		return textField
 	}()
 	
@@ -155,7 +157,8 @@ extension EditCategoryVC: UICollectionViewDataSource {
 		let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageCell.identifier, for: indexPath) as! ImageCell
 		let image = UIImage(systemName: imageArray[indexPath.row])!
 		cell.setup(with: image)
-		//if icon wasn`t chosen
+		
+		//MARK: - if icon wasn`t chosen -- FIX
 		if category.icon == nil && imageArray[indexPath.row] == "star.slash" {
 			cell.isSelected = true
 		}
@@ -172,8 +175,8 @@ extension EditCategoryVC: UICollectionViewDataSource {
 		} catch {
 			print("Error writing to Realm database \(error)")
 		}
+		print(category.icon)
 	}
-	
 }
 
 // MARK:- UICollectionViewDelegateFlowLayout
