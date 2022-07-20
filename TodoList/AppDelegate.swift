@@ -6,14 +6,16 @@
 //
 
 import UIKit
-import RealmSwift
+import UserNotifications
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+	let notifications = Notifications()
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+		
+		notifications.notificationCenter.delegate = notifications
 		
 		return true
 	}

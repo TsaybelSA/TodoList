@@ -175,7 +175,6 @@ extension EditCategoryVC: UICollectionViewDataSource {
 		} catch {
 			print("Error writing to Realm database \(error)")
 		}
-		print(category.icon)
 	}
 }
 

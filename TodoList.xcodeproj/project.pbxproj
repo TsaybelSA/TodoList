@@ -25,6 +25,7 @@
 		1787D9EA287C16B100E5ADF8 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1787D9E9287C16B100E5ADF8 /* TodoItem.swift */; };
 		17A579C42876FC5B00CB9137 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A579C32876FC5B00CB9137 /* CategoryViewController.swift */; };
 		17A579C62876FDA000CB9137 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A579C52876FDA000CB9137 /* CategoryTableViewCell.swift */; };
+		17DE5A6C2887DC1500B0E576 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DE5A6B2887DC1500B0E576 /* Notifications.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		1787D9E9287C16B100E5ADF8 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		17A579C32876FC5B00CB9137 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
 		17A579C52876FDA000CB9137 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
+		17DE5A6B2887DC1500B0E576 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 			children = (
 				1787D9E5287C010D00E5ADF8 /* Category.swift */,
 				1787D9E9287C16B100E5ADF8 /* TodoItem.swift */,
+				17DE5A6B2887DC1500B0E576 /* Notifications.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -202,6 +205,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17DE5A6C2887DC1500B0E576 /* Notifications.swift in Sources */,
 				173084462880F65700C80D25 /* EditCategoryVC.swift in Sources */,
 				17419DDC287306390089DAFD /* TodoTableViewCell.swift in Sources */,
 				1787D9E6287C010D00E5ADF8 /* Category.swift in Sources */,

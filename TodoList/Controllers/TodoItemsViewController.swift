@@ -7,17 +7,21 @@
 
 import SwiftUI
 import RealmSwift
+import NotificationCenter
 
 class TodoItemsViewController: UIViewController {
 	
+	let feedbackGenerator = UINotificationFeedbackGenerator()
+	
+	let notifications = Notifications()
+	
 	var selectedCategory = Category()
+	var items: Results<TodoItem>
 	
 	let realm: Realm
 	//if need this realm configuration, need to add it to appDelegate
 	let realmConfiguration: Realm.Configuration
 	var notificationToken: NotificationToken?
-	
-	var items: Results<TodoItem>
 	
 	required init(realmConfiguration: Realm.Configuration, selectedCategory: Category) {
 		self.realm = try! Realm(configuration: realmConfiguration)
@@ -166,7 +170,13 @@ extension TodoItemsViewController: UITableViewDelegate {
 			try realm.write {
 				item.isDone.toggle()
 				if item.isDone {
+					feedbackGenerator.notificationOccurred(.success)
 					item.indexBeforeCompleted = item.index
+					if let id = item.notificationIdentifier {
+						notifications.unscheduleNotification(with: id)
+					}
+					item.notificationIdentifier = nil
+					item.dateToRemind = nil
 				} else {
 					guard let index = item.indexBeforeCompleted else { return }
 					item.index = index

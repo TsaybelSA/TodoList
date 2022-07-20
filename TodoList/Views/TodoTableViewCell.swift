@@ -17,15 +17,18 @@ class TodoTableViewCell: UITableViewCell {
 		
 		contentView.addSubview(selectionImage)
 		contentView.addSubview(infoButton)
-		contentView.addSubview(label)
+		contentView.addSubview(todoItemBodyStack)
+		
 		NSLayoutConstraint.activate([
 			selectionImage.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
 			selectionImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
 			selectionImage.widthAnchor.constraint(equalToConstant: 30),
 			selectionImage.heightAnchor.constraint(equalToConstant: 30),
-			label.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 20),
-			label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-			infoButton.leadingAnchor.constraint(equalTo: label.trailingAnchor, constant: 10),
+			
+			todoItemBodyStack.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 20),
+			todoItemBodyStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+			
+			infoButton.leadingAnchor.constraint(equalTo: itemTitleLabel.trailingAnchor, constant: 10),
 			infoButton.widthAnchor.constraint(equalToConstant: 30),
 			infoButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
 			infoButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
@@ -45,9 +48,9 @@ class TodoTableViewCell: UITableViewCell {
 	
 	func setupCell(with item: TodoItem, editHandler: @escaping (TodoTableViewCell) -> Void) {
 		self.item = item
-		self.label.text = item.name
-		self.label.textColor = item.isDone ? .gray : .label
-		self.label.layer.opacity = item.isDone ? 0.5 : 1
+		self.itemTitleLabel.text = item.name
+		self.itemTitleLabel.textColor = item.isDone ? .gray : .label
+		self.itemTitleLabel.layer.opacity = item.isDone ? 0.5 : 1
 		self.selectionImage.image = UIImage(systemName: item.isDone ? "checkmark.circle.fill" : "circle.dashed")
 		self.selectionImage.layer.opacity = item.isDone ? 0.5 : 1
 		self.editHandler = editHandler
@@ -60,11 +63,30 @@ class TodoTableViewCell: UITableViewCell {
 		return imageView
 	}()
 	
-	lazy private var label: UILabel = {
+	lazy private var todoItemBodyStack: UIStackView = {
+		let stack = UIStackView(arrangedSubviews: [itemTitleLabel, remindDateLabel])
+		stack.axis = .vertical
+		stack.distribution = .fill
+		stack.spacing = 5
+		stack.alignment = .leading
+		stack.isLayoutMarginsRelativeArrangement = true
+		stack.translatesAutoresizingMaskIntoConstraints = false
+		return stack
+	}()
+	
+	lazy private var itemTitleLabel: UILabel = {
 		let label = UILabel(frame: .zero)
 		label.font = UIFont.systemFont(ofSize: 20)
 		label.numberOfLines = 2
-		label.translatesAutoresizingMaskIntoConstraints = false
+		return label
+	}()
+	
+	lazy private var remindDateLabel: UILabel = {
+		let label = UILabel()
+		label.text = "20 July 2022, 17:00"
+//		label.isHidden = item.dateToRemind == nil ? true : false
+		label.font = UIFont.systemFont(ofSize: 14)
+		label.numberOfLines = 1
 		return label
 	}()
 	
