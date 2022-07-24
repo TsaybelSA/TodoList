@@ -4,7 +4,7 @@
 //
 //  Created by Сергей Цайбель on 13.07.2022.
 //
-
+import UIKit
 import RealmSwift
 
 protocol IndexableObject: AnyObject {
@@ -29,3 +29,16 @@ extension Results where Element: IndexableObject {
 			}
 	}
 }
+extension Date {
+	func getStringFromDate() -> NSAttributedString {
+		let relativeDateFormatter = RelativeDateTimeFormatter()
+		relativeDateFormatter.unitsStyle = .full
+		
+		let color = self < Date() ? UIColor.red : .secondaryLabel
+		
+		let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: color]
+		let attributedString = NSAttributedString(string: relativeDateFormatter.string(for: self)!, attributes: attributes)
+		return attributedString
+	}
+}
+

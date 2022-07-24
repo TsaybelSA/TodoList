@@ -11,13 +11,12 @@ import UserNotifications
 
 class EditTodoCellViewController: UIViewController {
 	
-	let realm: Realm
+	let realm = (UIApplication.shared.delegate as! AppDelegate).realm!
 	var item: TodoItem
 		
 	let notifications = Notifications()
 			
-	required init(cellItem: TodoItem, realmConfiguration: Realm.Configuration) {
-		self.realm = try! Realm(configuration: realmConfiguration)
+	required init(cellItem: TodoItem) {
 		self.item = cellItem
 		super.init(nibName: nil, bundle: nil)
 	}
@@ -28,10 +27,12 @@ class EditTodoCellViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+		notifications.realm = realm
+		
+		textField.delegate = self
 		
 		view.backgroundColor = .secondarySystemBackground
 		setupToHideKeyboardOnTapOnView()
-		
 		
 		view.addSubview(dissmissViewButton)
 		view.addSubview(textField)
@@ -91,6 +92,7 @@ class EditTodoCellViewController: UIViewController {
 	
 	lazy private var datePicker: UIDatePicker = {
 		let datePicker = UIDatePicker()
+		datePicker.date = item.dateToRemind ?? Date(timeIntervalSinceNow: 3600)
 		datePicker.datePickerMode = .dateAndTime
 		datePicker.layer.opacity = item.dateToRemind == nil ? 0 : 1
 		datePicker.addTarget(nil, action: #selector(dateChosen), for: .valueChanged)
@@ -129,16 +131,19 @@ class EditTodoCellViewController: UIViewController {
 	
 	@objc func dateChosen() {
 		let date = datePicker.date
-//		
-		guard date.timeIntervalSinceNow > 0 else { print("Date in past"); return }
-		notifications.notificationRequest()
 		
-		let identifier = notifications.addNewNotification(for: item, with: datePicker.date)
+		var identifier: String?
+
+		if date > Date() {
+			print("now is \(Date()), notification at \(date)")
+			notifications.notificationRequest()
+			identifier = notifications.addNewNotification(for: item, with: datePicker.date)
+		}
 		//write new notification parameters
 		do {
 			try realm.write {
 				item.notificationIdentifier = identifier
-				item.dateToRemind = datePicker.date
+				item.dateToRemind = date
 			}
 		} catch {
 			print("Failed to write to Realm database \(error)")
@@ -147,6 +152,7 @@ class EditTodoCellViewController: UIViewController {
 	
 	@objc func dateSwitchStateChanged() {
 		if dateSwitch.isOn {
+			dateChosen()
 			UIView.animate(withDuration: 0.2, delay: 0) {
 				self.datePicker.layer.opacity = 1
 			}
@@ -158,7 +164,6 @@ class EditTodoCellViewController: UIViewController {
 			if let id = item.notificationIdentifier {
 				notifications.unscheduleNotification(with: id)
 			}
-			
 			do {
 				try realm.write {
 					item.dateToRemind = nil

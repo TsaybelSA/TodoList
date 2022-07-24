@@ -54,6 +54,11 @@ class TodoTableViewCell: UITableViewCell {
 		self.selectionImage.image = UIImage(systemName: item.isDone ? "checkmark.circle.fill" : "circle.dashed")
 		self.selectionImage.layer.opacity = item.isDone ? 0.5 : 1
 		self.editHandler = editHandler
+		
+		if let date = item.dateToRemind {
+			remindDateLabel.attributedText = date.getStringFromDate()
+		}
+		remindDateLabel.isHidden = item.dateToRemind == nil ? true : false
 	}
 	
 	lazy private var selectionImage: UIImageView = {
@@ -83,8 +88,6 @@ class TodoTableViewCell: UITableViewCell {
 	
 	lazy private var remindDateLabel: UILabel = {
 		let label = UILabel()
-		label.text = "20 July 2022, 17:00"
-//		label.isHidden = item.dateToRemind == nil ? true : false
 		label.font = UIFont.systemFont(ofSize: 14)
 		label.numberOfLines = 1
 		return label

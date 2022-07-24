@@ -18,17 +18,12 @@ class TodoItemsViewController: UIViewController {
 	var selectedCategory = Category()
 	var items: Results<TodoItem>
 	
-	let realm: Realm
+	let realm = (UIApplication.shared.delegate as! AppDelegate).realm!
 	//if need this realm configuration, need to add it to appDelegate
-	let realmConfiguration: Realm.Configuration
 	var notificationToken: NotificationToken?
 	
-	required init(realmConfiguration: Realm.Configuration, selectedCategory: Category) {
-		self.realm = try! Realm(configuration: realmConfiguration)
-		self.realmConfiguration = realmConfiguration
-		
+	required init(selectedCategory: Category) {
 		self.selectedCategory = selectedCategory
-		
 		items = selectedCategory.items.sorted(byKeyPath: "index")
 
 		super.init(nibName: nil, bundle: nil)
@@ -72,6 +67,7 @@ class TodoItemsViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		notifications.realm = realm
 		view.backgroundColor = .systemBackground
 		title = "\(selectedCategory.name)"
 		
@@ -218,7 +214,7 @@ extension TodoItemsViewController: UITableViewDelegate {
 	
 	//edit todo item
 	private func editCell(_ cell: TodoTableViewCell) -> Void {
-		let vc = EditTodoCellViewController(cellItem: cell.item, realmConfiguration: realmConfiguration)
+		let vc = EditTodoCellViewController(cellItem: cell.item)
 		present(vc, animated: true)
 	}
 	

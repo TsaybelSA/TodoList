@@ -7,11 +7,14 @@
 
 import UIKit
 import UserNotifications
+import RealmSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	let notifications = Notifications()
+	
+	var realm: Realm?
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		
@@ -32,6 +35,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Called when the user discards a scene session.
 		// If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
 		// Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+	}
+	
+	func configureRealm(configuration: Realm.Configuration) {
+		do {
+			realm = try Realm(configuration: configuration)
+			notifications.realm = realm
+		} catch {
+			print("Failed to create Realm from configuration \(error)")
+		}
 	}
 }
 

@@ -10,16 +10,12 @@ import RealmSwift
 
 class CategoryViewController: UIViewController {
 	
-	let realm: Realm
-	let realmConfiguration: Realm.Configuration
+	let realm = (UIApplication.shared.delegate as! AppDelegate).realm!
 	var notificationToken: NotificationToken?
 	
 	var categories: Results<Category>
 		
-	required init(realmConfiguration: Realm.Configuration) {
-		self.realm = try! Realm(configuration: realmConfiguration)
-		self.realmConfiguration = realmConfiguration
-		   
+	required init() {
 		categories = realm.objects(Category.self).sorted(byKeyPath: "index")
 
 		super.init(nibName: nil, bundle: nil)
@@ -136,7 +132,7 @@ extension CategoryViewController: UITableViewDelegate {
 	
 	//	push todoItemsViewController
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		let vc = TodoItemsViewController(realmConfiguration: realmConfiguration, selectedCategory: categories[indexPath.row])
+		let vc = TodoItemsViewController(selectedCategory: categories[indexPath.row])
 		navigationController?.pushViewController(vc, animated: true)
 	}
 	
@@ -179,7 +175,7 @@ extension CategoryViewController: UITableViewDataSource {
 	}
 	
 	func editCategory(_ cell: CategoryTableViewCell) -> Void {
-		let vc = EditCategoryVC(cellItem: cell.category, realmConfiguration: realmConfiguration)
+		let vc = EditCategoryVC(cellItem: cell.category)
 		present(vc, animated: true)
 	}
 }

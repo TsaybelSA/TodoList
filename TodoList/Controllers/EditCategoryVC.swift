@@ -10,7 +10,7 @@ import RealmSwift
 
 class EditCategoryVC: UIViewController {
 
-	let realm: Realm
+	let realm = (UIApplication.shared.delegate as! AppDelegate).realm!
 	var category: Category
 	
 	private let thumbnailSize = CGSize(width: 40, height: 40)
@@ -18,8 +18,7 @@ class EditCategoryVC: UIViewController {
 	
 	private let imageArray = ["star.slash", "star", "exclamationmark.circle", "gamecontroller", "tv", "car", "bus", "tram", "bicycle", "scooter", "tshirt","heart", "bolt.heart", "giftcard", "dollarsign.square","brain.head.profile", "pills", "pawprint", "leaf"]
 		
-	required init(cellItem: Category, realmConfiguration: Realm.Configuration) {
-		self.realm = try! Realm(configuration: realmConfiguration)
+	required init(cellItem: Category) {
 		self.category = cellItem
 		super.init(nibName: nil, bundle: nil)
 	}

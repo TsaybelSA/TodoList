@@ -109,10 +109,10 @@ class WelcomeViewController: UIViewController {
 		 config.fileURL!.deleteLastPathComponent()
 		 config.fileURL!.appendPathComponent("project=\(self.username!)")
 		 config.fileURL!.appendPathExtension("realm")
-		 navigationController!.pushViewController(
-			 CategoryViewController(realmConfiguration: config),
-			 animated: true
-		 )
+		
+		(UIApplication.shared.delegate as! AppDelegate).configureRealm(configuration: config)
+		
+		 navigationController!.pushViewController(CategoryViewController(),animated: true)
     }
 	
 }
