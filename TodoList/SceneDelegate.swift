@@ -32,6 +32,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	func sceneDidBecomeActive(_ scene: UIScene) {
 		// reset notifications badge to 0 when open app
 		UIApplication.shared.applicationIconBadgeNumber = 0
+
+		guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
+			return
+		}
+		if let todoVC = rootViewController.children.last as? TodoItemsViewController {
+			todoVC.tableView.reloadData()
+		}
 	}
 
 	func sceneWillResignActive(_ scene: UIScene) {
@@ -46,7 +53,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	func sceneDidEnterBackground(_ scene: UIScene) {
 	}
-
-
 }
 

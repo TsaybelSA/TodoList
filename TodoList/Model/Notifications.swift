@@ -25,11 +25,19 @@ class Notifications: NSObject {
 	}
 	//TODO: if user change notifications settings need to let him know that it won`t be delivered
 	
-	func unscheduleNotification(with identifier: String) {
+	func unscheduleNotification(for item: TodoItem, with identifier: String) {
 		notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+		do {
+			try realm?.write {
+				item.dateToRemind = nil
+				item.notificationIdentifier = nil
+			}
+		} catch {
+			print("Failed to write to Realm database \(error)")
+		}
 	}
 	
-	func addNewNotification(for item: TodoItem, with date: Date) -> String {
+	func addNewNotification(for item: TodoItem, with date: Date) {
 		let content = UNMutableNotificationContent()
 		let userActions = "User Actions"
 		
@@ -64,7 +72,14 @@ class Notifications: NSObject {
 		let category = UNNotificationCategory(identifier: userActions, actions: [remindAfterHour, remindTomorrow, finished, deleteTodoItem], intentIdentifiers: [])
 		notificationCenter.setNotificationCategories([category])
 		
-		return identifier
+		do {
+			try realm?.write {
+				item.notificationIdentifier = identifier
+				item.dateToRemind = date
+			}
+		} catch {
+			print("Failed to write to Realm database \(error)")
+		}
 	}
 	
 	enum ActionIdentifiers: String, CaseIterable {
@@ -72,17 +87,9 @@ class Notifications: NSObject {
 	}
 	
 	func reschedule(by time: TimeInterval, _ item: TodoItem) {
-		do {
-			try realm?.write {
-				if var date = item.dateToRemind {
-					date += time
-					item.dateToRemind! = date
-					item.notificationIdentifier = addNewNotification(for: item, with: date)
-					print(item)
-				}
-			}
-		} catch {
-			print("Failed to write to Realm \(error)")
+		if var date = item.dateToRemind {
+			date += time
+			addNewNotification(for: item, with: date)
 		}
 	}
 	
@@ -104,17 +111,20 @@ extension Notifications: UNUserNotificationCenterDelegate {
 			let notificationID = response.notification.request.identifier
 			guard let item = realm?.objects(TodoItem.self).first(where: { $0.notificationIdentifier == notificationID }) else { return }
 			notificationCenter.removeDeliveredNotifications(withIdentifiers: [notificationID])
+			UIApplication.shared.applicationIconBadgeNumber = 0
 			
 			switch response.actionIdentifier {
 				case UNNotificationDismissActionIdentifier:
 					print("Dismiss action")
 				case UNNotificationDefaultActionIdentifier:
-					//TODO: Fix - need to open current todoitem page
-					let window = UIWindow()
-					let rootViewController = WelcomeViewController()
-					let navigationController = UINavigationController(rootViewController: rootViewController)
-					navigationController.navigationBar.tintColor = K.CustomColors.iconColor
-					window.rootViewController = navigationController
+					guard let rootViewController = (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.window?.rootViewController else {
+						return
+					}
+					let todoItemsVC = TodoItemsViewController(selectedCategory: item.parentCategory.first!)
+					let categoryVC = CategoryViewController()
+					let navVC = rootViewController as? UINavigationController
+					navVC?.pushViewController(categoryVC, animated: true)
+					categoryVC.navigationController?.pushViewController(todoItemsVC, animated: true)
 					print("Default")
 					
 				case ActionIdentifiers.remindAfterHour.rawValue:

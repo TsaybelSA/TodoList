@@ -135,19 +135,11 @@ class EditTodoCellViewController: UIViewController {
 		var identifier: String?
 
 		if date > Date() {
-			print("now is \(Date()), notification at \(date)")
 			notifications.notificationRequest()
-			identifier = notifications.addNewNotification(for: item, with: datePicker.date)
+			notifications.addNewNotification(for: item, with: datePicker.date)
 		}
 		//write new notification parameters
-		do {
-			try realm.write {
-				item.notificationIdentifier = identifier
-				item.dateToRemind = date
-			}
-		} catch {
-			print("Failed to write to Realm database \(error)")
-		}
+
 	}
 	
 	@objc func dateSwitchStateChanged() {
@@ -162,15 +154,7 @@ class EditTodoCellViewController: UIViewController {
 			}
 			// remove notification from notification queue
 			if let id = item.notificationIdentifier {
-				notifications.unscheduleNotification(with: id)
-			}
-			do {
-				try realm.write {
-					item.dateToRemind = nil
-					item.notificationIdentifier = nil
-				}
-			} catch {
-				print("Failed to write to Realm database \(error)")
+				notifications.unscheduleNotification(for: item, with: id)
 			}
 		}
 	}

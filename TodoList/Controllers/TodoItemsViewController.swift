@@ -79,12 +79,14 @@ class TodoItemsViewController: UIViewController {
 		setupView()
 	}
 	
-	private let tableView: UITableView = {
-		$0.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
-		$0.rowHeight = 60
-		$0.allowsSelectionDuringEditing = true
-		$0.translatesAutoresizingMaskIntoConstraints = false
-		return $0 }(UITableView())
+	let tableView: UITableView = {
+		let tableView = UITableView()
+		tableView.register(TodoTableViewCell.self, forCellReuseIdentifier: "todoItemCell")
+		tableView.rowHeight = 60
+		tableView.allowsSelectionDuringEditing = true
+		tableView.translatesAutoresizingMaskIntoConstraints = false
+		return tableView
+	}()
 	
 	private let searchBar: UISearchBar = {
 		$0.translatesAutoresizingMaskIntoConstraints = false
@@ -169,10 +171,8 @@ extension TodoItemsViewController: UITableViewDelegate {
 					feedbackGenerator.notificationOccurred(.success)
 					item.indexBeforeCompleted = item.index
 					if let id = item.notificationIdentifier {
-						notifications.unscheduleNotification(with: id)
+						notifications.unscheduleNotification(for: item, with: id)
 					}
-					item.notificationIdentifier = nil
-					item.dateToRemind = nil
 				} else {
 					guard let index = item.indexBeforeCompleted else { return }
 					item.index = index
