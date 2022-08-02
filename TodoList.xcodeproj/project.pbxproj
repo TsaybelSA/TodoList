@@ -7,29 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		173084462880F65700C80D25 /* EditCategoryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173084452880F65700C80D25 /* EditCategoryVC.swift */; };
+		1730847A288144DE00C80D25 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17308479288144DE00C80D25 /* ImageCell.swift */; };
 		17419DC628728AD50089DAFD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DC528728AD50089DAFD /* AppDelegate.swift */; };
 		17419DC828728AD50089DAFD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DC728728AD50089DAFD /* SceneDelegate.swift */; };
-		17419DCA28728AD50089DAFD /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DC928728AD50089DAFD /* RootViewController.swift */; };
+		17419DCA28728AD50089DAFD /* TodoItemsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DC928728AD50089DAFD /* TodoItemsViewController.swift */; };
 		17419DCF28728AD60089DAFD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 17419DCE28728AD60089DAFD /* Assets.xcassets */; };
 		17419DD228728AD60089DAFD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 17419DD028728AD60089DAFD /* LaunchScreen.storyboard */; };
 		17419DDA28729CC10089DAFD /* UtilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DD928729CC10089DAFD /* UtilityView.swift */; };
-		17419DDC287306390089DAFD /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DDB287306390089DAFD /* TableViewCell.swift */; };
-		17419DE02873D6940089DAFD /* EditCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DDF2873D6940089DAFD /* EditCellViewController.swift */; };
-		17419DE22873EF570089DAFD /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DE12873EF570089DAFD /* TodoItem.swift */; };
+		17419DDC287306390089DAFD /* TodoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DDB287306390089DAFD /* TodoTableViewCell.swift */; };
+		17419DE02873D6940089DAFD /* EditTodoCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17419DDF2873D6940089DAFD /* EditTodoCellViewController.swift */; };
+		174C993D287E9C2E00773D03 /* UtilityExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174C993C287E9C2E00773D03 /* UtilityExtensions.swift */; };
+		1787D9E0287BFE0800E5ADF8 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 1787D9DF287BFE0800E5ADF8 /* Realm */; };
+		1787D9E2287BFE0800E5ADF8 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1787D9E1287BFE0800E5ADF8 /* RealmSwift */; };
+		1787D9E6287C010D00E5ADF8 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1787D9E5287C010D00E5ADF8 /* Category.swift */; };
+		1787D9E8287C0E8800E5ADF8 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1787D9E7287C0E8800E5ADF8 /* WelcomeViewController.swift */; };
+		1787D9EA287C16B100E5ADF8 /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1787D9E9287C16B100E5ADF8 /* TodoItem.swift */; };
+		17A579C42876FC5B00CB9137 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A579C32876FC5B00CB9137 /* CategoryViewController.swift */; };
+		17A579C62876FDA000CB9137 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A579C52876FDA000CB9137 /* CategoryTableViewCell.swift */; };
+		17DE5A6C2887DC1500B0E576 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DE5A6B2887DC1500B0E576 /* Notifications.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		173084452880F65700C80D25 /* EditCategoryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryVC.swift; sourceTree = "<group>"; };
+		17308479288144DE00C80D25 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
 		17419DC228728AD50089DAFD /* TodoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		17419DC528728AD50089DAFD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		17419DC728728AD50089DAFD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		17419DC928728AD50089DAFD /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+		17419DC928728AD50089DAFD /* TodoItemsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemsViewController.swift; sourceTree = "<group>"; };
 		17419DCE28728AD60089DAFD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		17419DD128728AD60089DAFD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		17419DD328728AD60089DAFD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		17419DD928729CC10089DAFD /* UtilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilityView.swift; sourceTree = "<group>"; };
-		17419DDB287306390089DAFD /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
-		17419DDF2873D6940089DAFD /* EditCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCellViewController.swift; sourceTree = "<group>"; };
-		17419DE12873EF570089DAFD /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
+		17419DDB287306390089DAFD /* TodoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoTableViewCell.swift; sourceTree = "<group>"; };
+		17419DDF2873D6940089DAFD /* EditTodoCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTodoCellViewController.swift; sourceTree = "<group>"; };
+		174C993C287E9C2E00773D03 /* UtilityExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilityExtensions.swift; sourceTree = "<group>"; };
+		1787D9E5287C010D00E5ADF8 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		1787D9E7287C0E8800E5ADF8 /* WelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		1787D9E9287C16B100E5ADF8 /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
+		17A579C32876FC5B00CB9137 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
+		17A579C52876FDA000CB9137 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
+		17DE5A6B2887DC1500B0E576 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +55,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1787D9E2287BFE0800E5ADF8 /* RealmSwift in Frameworks */,
+				1787D9E0287BFE0800E5ADF8 /* Realm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,9 +85,10 @@
 				17419DC528728AD50089DAFD /* AppDelegate.swift */,
 				17419DC728728AD50089DAFD /* SceneDelegate.swift */,
 				17419DD928729CC10089DAFD /* UtilityView.swift */,
+				174C993C287E9C2E00773D03 /* UtilityExtensions.swift */,
 				17419DE32873EF5F0089DAFD /* Model */,
-				17419DDE2873065E0089DAFD /* Controller */,
-				17419DDD287306410089DAFD /* View */,
+				17419DDE2873065E0089DAFD /* Controllers */,
+				17419DDD287306410089DAFD /* Views */,
 				17419DCE28728AD60089DAFD /* Assets.xcassets */,
 				17419DD028728AD60089DAFD /* LaunchScreen.storyboard */,
 				17419DD328728AD60089DAFD /* Info.plist */,
@@ -75,27 +96,34 @@
 			path = TodoList;
 			sourceTree = "<group>";
 		};
-		17419DDD287306410089DAFD /* View */ = {
+		17419DDD287306410089DAFD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				17419DDB287306390089DAFD /* TableViewCell.swift */,
+				17419DDB287306390089DAFD /* TodoTableViewCell.swift */,
+				17A579C52876FDA000CB9137 /* CategoryTableViewCell.swift */,
+				17308479288144DE00C80D25 /* ImageCell.swift */,
 			);
-			path = View;
+			path = Views;
 			sourceTree = "<group>";
 		};
-		17419DDE2873065E0089DAFD /* Controller */ = {
+		17419DDE2873065E0089DAFD /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				17419DDF2873D6940089DAFD /* EditCellViewController.swift */,
-				17419DC928728AD50089DAFD /* RootViewController.swift */,
+				1787D9E7287C0E8800E5ADF8 /* WelcomeViewController.swift */,
+				17A579C32876FC5B00CB9137 /* CategoryViewController.swift */,
+				17419DC928728AD50089DAFD /* TodoItemsViewController.swift */,
+				17419DDF2873D6940089DAFD /* EditTodoCellViewController.swift */,
+				173084452880F65700C80D25 /* EditCategoryVC.swift */,
 			);
-			path = Controller;
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 		17419DE32873EF5F0089DAFD /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				17419DE12873EF570089DAFD /* TodoItem.swift */,
+				1787D9E5287C010D00E5ADF8 /* Category.swift */,
+				1787D9E9287C16B100E5ADF8 /* TodoItem.swift */,
+				17DE5A6B2887DC1500B0E576 /* Notifications.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -116,6 +144,10 @@
 			dependencies = (
 			);
 			name = TodoList;
+			packageProductDependencies = (
+				1787D9DF287BFE0800E5ADF8 /* Realm */,
+				1787D9E1287BFE0800E5ADF8 /* RealmSwift */,
+			);
 			productName = TodoList;
 			productReference = 17419DC228728AD50089DAFD /* TodoList.app */;
 			productType = "com.apple.product-type.application";
@@ -144,6 +176,9 @@
 				Base,
 			);
 			mainGroup = 17419DB928728AD50089DAFD;
+			packageReferences = (
+				1787D9DE287BFE0800E5ADF8 /* XCRemoteSwiftPackageReference "realm-swift" */,
+			);
 			productRefGroup = 17419DC328728AD50089DAFD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -170,13 +205,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				17419DDC287306390089DAFD /* TableViewCell.swift in Sources */,
-				17419DCA28728AD50089DAFD /* RootViewController.swift in Sources */,
+				17DE5A6C2887DC1500B0E576 /* Notifications.swift in Sources */,
+				173084462880F65700C80D25 /* EditCategoryVC.swift in Sources */,
+				17419DDC287306390089DAFD /* TodoTableViewCell.swift in Sources */,
+				1787D9E6287C010D00E5ADF8 /* Category.swift in Sources */,
+				174C993D287E9C2E00773D03 /* UtilityExtensions.swift in Sources */,
+				1787D9E8287C0E8800E5ADF8 /* WelcomeViewController.swift in Sources */,
+				17419DCA28728AD50089DAFD /* TodoItemsViewController.swift in Sources */,
 				17419DC628728AD50089DAFD /* AppDelegate.swift in Sources */,
+				17A579C42876FC5B00CB9137 /* CategoryViewController.swift in Sources */,
+				1730847A288144DE00C80D25 /* ImageCell.swift in Sources */,
+				1787D9EA287C16B100E5ADF8 /* TodoItem.swift in Sources */,
 				17419DC828728AD50089DAFD /* SceneDelegate.swift in Sources */,
-				17419DE02873D6940089DAFD /* EditCellViewController.swift in Sources */,
-				17419DE22873EF570089DAFD /* TodoItem.swift in Sources */,
+				17419DE02873D6940089DAFD /* EditTodoCellViewController.swift in Sources */,
 				17419DDA28729CC10089DAFD /* UtilityView.swift in Sources */,
+				17A579C62876FDA000CB9137 /* CategoryTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +429,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1787D9DE287BFE0800E5ADF8 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.19.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1787D9DF287BFE0800E5ADF8 /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1787D9DE287BFE0800E5ADF8 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = Realm;
+		};
+		1787D9E1287BFE0800E5ADF8 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1787D9DE287BFE0800E5ADF8 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 17419DBA28728AD50089DAFD /* Project object */;
 }
